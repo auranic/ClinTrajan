@@ -2,7 +2,10 @@
 
 ## Specificity of clinical datasets
 
-Large clinical datasets are becoming increasingly available for systematic mining of associations between phenotypics data. 
+Large clinical datasets are becoming increasingly available for systematic mining the associations between phenotypic variables,
+characterizing a particular disease. Specific properties of the clinical datasets represent challenges for applying the 
+standard repository of machine learning methods. 
+
 We assume that the real-life clinical data are characterized by the following features:
 1) They contain mixed data types (continuous, binary, ordinal, categorical variables)
 2) They typically contain missing values with non-random pattern across the data matrix

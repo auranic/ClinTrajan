@@ -54,3 +54,7 @@ The oridinal database was collected in the Krasnoyarsk Interdistrict Clinical Ho
 ### Diabetes readmission data set from UCI Machine Learning Repository
 
 The dataset represents 10 years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. It includes over 50 features representing patient and hospital outcomes. The dataset can be downloaded from UCI repository at https://archive.ics.uci.edu/ml/datasets/diabetes+130-us+hospitals+for+years+1999-2008 or from Kaggle at https://www.kaggle.com/brandao/diabetes. The data matrix contains 100000 hospitalization cases with patients suffering from diabetis characterized by 55 attributes.
+
+## References:
+
+

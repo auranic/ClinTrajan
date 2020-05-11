@@ -46,8 +46,8 @@ We demonstrate application of the methodology to two clinical datasets, one of m
 
 ### Complications of myocardial infarction
 
-The oridinal database was collected in the Krasnoyarsk Interdistrict Clinical Hospital (Russia) in 1992-1995 years. The original database and its description cab be downloaded from [https://leicester.figshare.com/articles/Myocardial_infarction_complications_Database/12045261/1]. It contains information about 1700 patients and 110 features characterizing the clinical phenotypes and 12 features representing possible complications of the myocardial infarction disease. 
+The oridinal database was collected in the Krasnoyarsk Interdistrict Clinical Hospital (Russia) in 1992-1995 years. The original database and its description cab be downloaded from [[https://leicester.figshare.com/articles/Myocardial_infarction_complications_Database/12045261/1]]. It contains information about 1700 patients and 110 features characterizing the clinical phenotypes and 12 features representing possible complications of the myocardial infarction disease. 
 
 ### Diabetes data set from UCI Machine Learning Repository
 
-The dataset represents 10 years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. It includes over 50 features representing patient and hospital outcomes. The dataset can be downloaded from [https://archive.ics.uci.edu/ml/datasets/diabetes+130-us+hospitals+for+years+1999-2008]. The data matrix contains 100000 clinical cases of diabetis characterized by 55 attributes.
+The dataset represents 10 years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. It includes over 50 features representing patient and hospital outcomes. The dataset can be downloaded from [[https://archive.ics.uci.edu/ml/datasets/diabetes+130-us+hospitals+for+years+1999-2008]]. The data matrix contains 100000 clinical cases of diabetis characterized by 55 attributes.

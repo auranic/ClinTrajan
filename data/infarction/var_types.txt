@@ -1,0 +1,117 @@
+VALS	VAL_NUMBER	TYPE
+AGE 	 	[ 26.0 ...  62 values... 92.0 ]	 CONTINUOUS
+SEX 	 [0, 1] 	 2 	 BINARY
+INF_ANAM 	 [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0] 	 7 	 ORDINAL
+STENOK_AN 	 [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0] 	 7 	 ORDINAL
+FK_STENOK 	 [0.0, 1.0, 2.0, 3.0, 4.0, 8.0] 	 6 	 ORDINAL
+IBS_POST 	 [0.0, 1.0, 2.0] 	 3 	 ORDINAL
+GB 	 [0.0, 1.0, 2.0, 3.0] 	 4 	 ORDINAL
+SIM_GIPERT 	 [0.0, 1.0] 	 2 	 BINARY
+DLIT_AG 	 [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 10.0] 	 9 	 ORDINAL
+ZSN_A 	 [0.0, 1.0, 2.0, 3.0, 4.0] 	 5 	 ORDINAL
+nr_11 	 [0.0, 1.0] 	 2 	 BINARY
+nr_01 	 [0.0, 1.0] 	 2 	 BINARY
+nr_02 	 [0.0, 1.0] 	 2 	 BINARY
+nr_03 	 [0.0, 1.0] 	 2 	 BINARY
+nr_04 	 [0.0, 1.0] 	 2 	 BINARY
+nr_07 	 [0.0, 1.0] 	 2 	 BINARY
+nr_08 	 [0.0, 1.0] 	 2 	 BINARY
+np_01 	 [0.0, 1.0] 	 2 	 BINARY
+np_04 	 [0.0, 1.0] 	 2 	 BINARY
+np_05 	 [0.0, 1.0] 	 2 	 BINARY
+np_07 	 [0.0, 1.0] 	 2 	 BINARY
+np_08 	 [0.0, 1.0] 	 2 	 BINARY
+np_09 	 [0.0, 1.0] 	 2 	 BINARY
+np_10 	 [0.0, 1.0] 	 2 	 BINARY
+endocr_01 	 [0.0, 1.0] 	 2 	 BINARY
+endocr_02 	 [0.0, 1.0] 	 2 	 BINARY
+endocr_03 	 [0.0, 1.0] 	 2 	 BINARY
+zab_leg_01 	 [0.0, 1.0] 	 2 	 BINARY
+zab_leg_02 	 [0.0, 1.0] 	 2 	 BINARY
+zab_leg_03 	 [0.0, 1.0] 	 2 	 BINARY
+zab_leg_04 	 [0.0, 1.0] 	 2 	 BINARY
+zab_leg_06 	 [0.0, 1.0] 	 2 	 BINARY
+S_AD_ORIT 	 	[ 0.0 ...  32 values... 240.0 ]	 CONTINUOUS
+D_AD_ORIT 	 	[ 0.0 ...  20 values... 190.0 ]	 CONTINUOUS
+O_L_POST 	 [0.0, 1.0] 	 2 	 BINARY
+K_SH_POST 	 [0.0, 1.0] 	 2 	 BINARY
+MP_TP_POST 	 [0.0, 1.0] 	 2 	 BINARY
+SVT_POST 	 [0.0, 1.0] 	 2 	 BINARY
+GT_POST 	 [0.0, 1.0] 	 2 	 BINARY
+FIB_G_POST 	 [0.0, 1.0] 	 2 	 BINARY
+ant_im 	 [0.0, 1.0, 2.0, 3.0, 4.0] 	 5 	 ORDINAL
+lat_im 	 [0.0, 1.0, 2.0, 3.0, 4.0] 	 5 	 ORDINAL
+inf_im 	 [0.0, 1.0, 2.0, 3.0, 4.0] 	 5 	 ORDINAL
+post_im 	 [0.0, 1.0, 2.0, 3.0, 4.0] 	 5 	 ORDINAL
+IM_PG_P 	 [0.0, 1.0] 	 2 	 BINARY
+ritm_ecg_p_01 	 [0.0, 1.0] 	 2 	 BINARY
+ritm_ecg_p_02 	 [0.0, 1.0] 	 2 	 BINARY
+ritm_ecg_p_04 	 [0.0, 1.0] 	 2 	 BINARY
+ritm_ecg_p_06 	 [0.0, 1.0] 	 2 	 BINARY
+ritm_ecg_p_07 	 [0.0, 1.0] 	 2 	 BINARY
+ritm_ecg_p_08 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_01 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_02 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_03 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_04 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_05 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_06 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_08 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_09 	 [0.0, 1.0] 	 2 	 BINARY
+n_r_ecg_p_10 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_01 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_03 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_04 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_05 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_06 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_07 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_08 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_09 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_10 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_11 	 [0.0, 1.0] 	 2 	 BINARY
+n_p_ecg_p_12 	 [0.0, 1.0] 	 2 	 BINARY
+fibr_ter_01 	 [0.0, 1.0] 	 2 	 BINARY
+fibr_ter_02 	 [0.0, 1.0] 	 2 	 BINARY
+fibr_ter_03 	 [0.0, 1.0] 	 2 	 BINARY
+fibr_ter_05 	 [0.0, 1.0] 	 2 	 BINARY
+fibr_ter_06 	 [0.0, 1.0] 	 2 	 BINARY
+fibr_ter_07 	 [0.0, 1.0] 	 2 	 BINARY
+fibr_ter_08 	 [0.0, 1.0] 	 2 	 BINARY
+GIPO_K 	 [0.0, 1.0] 	 2 	 BINARY
+K_BLOOD 	 	[ 2.3 ...  51 values... 8.2 ]	 CONTINUOUS
+GIPER_NA 	 [0.0, 1.0] 	 2 	 BINARY
+NA_BLOOD 	 	[ 117.0 ...  40 values... 169.0 ]	 CONTINUOUS
+ALT_BLOOD 	 	[ 0.03 ...  68 values... 3.0 ]	 CONTINUOUS
+AST_BLOOD 	 	[ 0.04 ...  57 values... 2.15 ]	 CONTINUOUS
+L_BLOOD 	 	[ 2.0 ...  173 values... 27.9 ]	 CONTINUOUS
+ROE 	 	[ 1.0 ...  58 values... 140.0 ]	 CONTINUOUS
+TIME_B_S 	 [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0] 	 9 	 ORDINAL
+R_AB_1_n 	 [0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 7.0] 	 7 	 ORDINAL
+R_AB_2_n 	 [0.0, 1.0, 2.0, 3.0] 	 4 	 ORDINAL
+R_AB_3_n 	 [0.0, 1.0, 2.0, 4.0] 	 4 	 ORDINAL
+NITR_S 	 [0.0, 1.0, 10.0] 	 3 	 ORDINAL
+NA_R_1_n 	 [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0] 	 7 	 ORDINAL
+NA_R_2_n 	 [0.0, 1.0, 2.0, 3.0] 	 4 	 ORDINAL
+NA_R_3_n 	 [0.0, 1.0, 2.0] 	 3 	 ORDINAL
+NOT_NA_1_n 	 [0.0, 1.0, 2.0, 3.0, 4.0] 	 5 	 ORDINAL
+NOT_NA_2_n 	 [0.0, 1.0, 2.0, 3.0] 	 4 	 ORDINAL
+NOT_NA_3_n 	 [0.0, 1.0, 2.0] 	 3 	 ORDINAL
+LID_S_n 	 [0.0, 1.0] 	 2 	 BINARY
+B_BLOK_S_n 	 [0.0, 1.0] 	 2 	 BINARY
+ANT_CA_S_n 	 [0.0, 1.0] 	 2 	 BINARY
+GEPAR_S_n 	 [0.0, 1.0] 	 2 	 BINARY
+ASP_S_n 	 [0.0, 1.0] 	 2 	 BINARY
+TIKL_S_n 	 [0.0, 1.0] 	 2 	 BINARY
+TRENT_S_n 	 [0.0, 1.0] 	 2 	 BINARY
+FIBR_PREDS 	 [0.0, 1.0] 	 2 	 BINARY
+PREDS_TAH 	 [0, 1] 	 2 	 BINARY
+JELUD_TAH 	 [0, 1] 	 2 	 BINARY
+FIBR_JELUD 	 [0, 1] 	 2 	 BINARY
+A_V_BLOK 	 [0, 1] 	 2 	 BINARY
+OTEK_LANC 	 [0, 1] 	 2 	 BINARY
+RAZRIV 	 [0, 1] 	 2 	 BINARY
+DRESSLER 	 [0, 1] 	 2 	 BINARY
+ZSN 	 [0.0, 1.0] 	 2 	 BINARY
+REC_IM 	 [0, 1] 	 2 	 BINARY
+P_IM_STEN 	 [0.0, 1.0] 	 2 	 BINARY
+LET_IS 	 [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0] 	 8 	 ORDINAL

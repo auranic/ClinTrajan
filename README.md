@@ -4,11 +4,11 @@
 
 Large clinical datasets are becoming increasingly available for systematic mining the associations between phenotypic variables,
 characterizing a particular disease. Specific properties of the clinical datasets represent challenges for applying the 
-standard repository of machine learning methods. 
+standard repertoire of machine learning methods. 
 
 We assume that the real-life clinical data are characterized by the following features:
-1) They contain mixed data types (continuous, binary, ordinal, categorical variables)
-2) They typically contain missing values with non-random pattern across the data matrix
+1) They contain mixed data types (continuous, binary, ordinal, categorical variables, censored data)
+2) They typically contain missing values with non-uniform pattern across the data matrix
 3) They do not have a uniquely defined labeling (part of the clinical variables can be used to define clinical groups, 
 but this can be done in several meaningfull ways)
 
@@ -21,7 +21,7 @@ possibly representing consequtive states of a developing disease phenotype and l
 lethal outcome). We also assume that clinical trajectories might be characterized by branching structure, representing
 some important bifurcations in the development of a disease. 
 
-Extracting cellular trajectories is a widely used methodology of genomics data analysis. 
+Extracting cellular trajectories is a widely used methodology of data analysis in genomics, especially in studying certain highly dynamic phenomena such as differentiation or development. 
 Quantifying and visualizing clinical trajectories represents a more challenging data mining problem due to the data specificity.
 
 ## Dimensionality reduction and manifold learning in clinical datasets
@@ -49,7 +49,7 @@ We demonstrate application of the methodology to two clinical datasets, one of m
 
 ### Complications of myocardial infarction
 
-The oridinal database was collected in the Krasnoyarsk Interdistrict Clinical Hospital (Russia) in 1992-1995 years. The original database and its description cab be downloaded from https://leicester.figshare.com/articles/Myocardial_infarction_complications_Database/12045261/1. It contains information about 1700 patients and 110 features characterizing the clinical phenotypes and 12 features representing possible complications of the myocardial infarction disease. 
+The database was collected in the Krasnoyarsk Interdistrict Clinical Hospital (Russia) in 1992-1995 years. The original database and its description can be downloaded from https://leicester.figshare.com/articles/Myocardial_infarction_complications_Database/12045261/1. It contains information about 1700 patients and 110 features characterizing the clinical phenotypes and 12 features representing possible complications of the myocardial infarction disease. 
 
 ### Diabetes readmission data set from UCI Machine Learning Repository
 

@@ -24,3 +24,14 @@ Files and their provenances:
                 -- deps_dummies_q_imp_SVDcomplete.txt - quantified imputed matrix using SVDcomplete method
 
 
+* SVDcomplete method for missing value imputation:
+	0) k parameter is chosen (number of principal components) - intrinsic linear dimensionality seems to be not a bad choice
+	1) SVD (PCA) is computed for the complete rows of the dataset, for k components
+	2) Vectors with missing values are projected onto the k principal components (closest point of the manifold, the scalar product is adapted accordingly)
+	3) The imputed value is read from the projection
+
+* SVDmissing method for missing value imputation:
+	0) k parameter is chosen (number of principal components) - intrinsic linear dimensionality seems to be not a bad choice	
+	1) A special version of SVD (PCA) is computed for the complete dataset, including missing values, for k components
+	2) Vectors with missing values are projected onto the k principal components (closest point of the manifold, the scalar product is adapted accordingly)
+	3) The imputed value is read from the projection

@@ -10,6 +10,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
+from clintraj_util import moving_weighted_average
+from clintraj_util import fill_gaps_in_number_sequence
+
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.model_selection import GridSearchCV
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from sklearn.metrics import r2_score
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
+
 import scipy.optimize
 import copy
 import warnings
@@ -18,18 +29,24 @@ from elpigraph.src.core import PartitionData
 from elpigraph.src.distutils import PartialDistance
 from elpigraph.src.reporting import project_point_onto_graph, project_point_onto_edge
 
+from scipy import signal
+from scipy.stats import spearmanr
+import seaborn as sns 
+
 
 def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vectors,mean_vector,color,variable_names,
                               showEdgeNumbers=False,showNodeNumbers=False,showBranchNumbers=False,showPointNumbers=False,
                               Color_by_feature = '', Feature_Edge_Width = '', Invert_Edge_Value = False,
-                              Min_Edge_Width = 10, Max_Edge_Width = 10, 
-                              Big_Point_Size = 100, Small_Point_Size = 1, Normal_Point_Size = 30,
-                              Visualize_Edge_Width_AsNodeCoordinates=False,
+                              Min_Edge_Width = 5, Max_Edge_Width = 5, 
+                              Big_Point_Size = 100, Small_Point_Size = 1, Normal_Point_Size = 20,
+                              Visualize_Edge_Width_AsNodeCoordinates=True,
                               Color_by_partitioning = False,
-                              vec_labels_by_branches = [],
+                              visualize_partition = [],
                               Transparency_Alpha = 0.2,
+                              verbose=False,
                               Visualize_Branch_Class_Associations = [], #list_of_branch_class_associations
-                              cmap = 'cool',scatter_parameter=0.03,highlight_subset=[]):
+                              cmap = 'cool',scatter_parameter=0.03,highlight_subset=[],
+                              add_color_bar=False):
 
     nodep = tree_elpi['NodePositions']
     nodep_original = np.matmul(nodep,principal_component_vectors[:,0:X.shape[1]].T)+mean_vector
@@ -40,7 +57,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
         k = variable_names.index(Color_by_feature)
         color2 = X_original[:,k]
     if Color_by_partitioning:
-        color2 = vec_labels_by_branches
+        color2 = visualize_partition
         color_seq = [[1,0,0],[0,1,0],[0,0,1],[0,1,1],[1,0,1],[1,1,0],
              [1,0,0.5],[1,0.5,0],[0.5,0,1],[0.5,1,0],
              [0.5,0.5,1],[0.5,1,0.5],[1,0.5,0.5],
@@ -55,7 +72,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
             k = np.where(color2_unique==c)[0][0]
             count = color2_count[k]
             k1 = np.where(inds==k)[0][0]
-            k1 = k%len(color_seq)
+            k1 = k1%len(color_seq)
             col = color_seq[k1]
             newc.append(col)
         color2 = newc
@@ -73,13 +90,15 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
 
     node_size = 10
     #Associate each node with datapoints
-    print('Partitioning the data...')
+    if verbose:
+        print('Partitioning the data...')
     partition, dists = elpigraph.src.core.PartitionData(X = X, NodePositions = nodep, MaxBlockSize = 100000000, TrimmingRadius = np.inf,SquaredX = np.sum(X**2,axis=1,keepdims=1))
     #col_nodes = {node: color[np.where(partition==node)[0]] for node in np.unique(partition)}
 
 
     #Project points onto the graph
-    print('Projecting data points onto the graph...')
+    if verbose:
+        print('Projecting data points onto the graph...')
     ProjStruct = elpigraph.src.reporting.project_point_onto_graph(X = X,
                                      NodePositions = nodep,
                                      Edges = edges,
@@ -94,7 +113,8 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
     dist2proj = dist2proj-shift
 
     #Create graph
-    print('Producing graph layout...')
+    if verbose:
+        print('Producing graph layout...')
     g=nx.Graph()
     g.add_edges_from(edges)
     pos = nx.kamada_kawai_layout(g,scale=2)
@@ -102,9 +122,9 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
     #pos = nx.spring_layout(g,scale=2)
     idx=np.array([pos[j] for j in range(len(pos))])
 
-    plt.figure(figsize=(16,16))
-
-    print('Calculating scatter aroung the tree...')
+    #plt.figure(figsize=(16,16))
+    if verbose:
+        print('Calculating scatter aroung the tree...')
     x = np.zeros(len(X))
     y = np.zeros(len(X))
     for i in range(len(X)):
@@ -156,9 +176,10 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
         for j in range(len(X)):
             plt.text(x[j],y[j],j)
     if len(highlight_subset)>0:
-        [color_subset] = [color2[i] for i in highlight_subset]
+        color_subset = [color2[i] for i in highlight_subset]
         plt.scatter(x[highlight_subset],y[highlight_subset],c=color_subset,cmap=cmap,s=Big_Point_Size)
-    plt.colorbar()
+    if add_color_bar:
+        plt.colorbar()
 
 
     #Scatter nodes
@@ -169,7 +190,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
     if not Feature_Edge_Width=='' and not Visualize_Edge_Width_AsNodeCoordinates:
         k = variable_names.index(Feature_Edge_Width)
         for j in range(len(edges)):
-            vals = X_original[np.where(edgeid==j),k]
+            vals = X_original[np.where(edgeid==j)[0],k]
             vals = (np.array(vals)-np.min(X_original[:,k]))/(np.max(X_original[:,k])-np.min(X_original[:,k]))
             edge_vals[j] = np.mean(vals)
         for j in range(len(edges)):
@@ -208,9 +229,9 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
             plt.text((x_coo[0]+x_coo[1])/2,(y_coo[0]+y_coo[1])/2,j,FontSize=20,bbox=dict(facecolor='grey', alpha=0.5))
 
     if showBranchNumbers:
-        branch_vals = list(set(vec_labels_by_branches))
+        branch_vals = list(set(visualize_partition))
         for i,val in enumerate(branch_vals):
-            ind = vec_labels_by_branches==val
+            ind = visualize_partition==val
             xbm = np.mean(x[ind])
             ybm = np.mean(y[ind])
             plt.text(xbm,ybm,int(val),FontSize=20,bbox=dict(facecolor='grey', alpha=0.5))
@@ -539,7 +560,11 @@ def pseudo_time(root_node,point_index,traj,projval,edgeid,edges):
     pstime = i+proj_val_x
     return pstime
 
-def pseudo_time_trajectory(traj,projval,edgeid,edges,partition):
+def pseudo_time_trajectory(traj,ProjStruct):
+    projval = ProjStruct['ProjectionValues']
+    edgeid = (ProjStruct['EdgeID']).astype(int)
+    edges = ProjStruct['Edges']
+    partition = ProjStruct['Partition']
     traj_points = np.zeros(0,'int32')
     for p in traj:
         traj_points = np.concatenate((traj_points,np.where(partition==p)[0]))
@@ -574,3 +599,159 @@ def extract_trajectories(tree,root_node,verbose=False):
             print('Edges:',ped)
         # compute pseudotime along each path
     return all_trajectories
+
+def correlation_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,X_original,verbose=False,producePlot=False,Correlation_Threshold=0.5):
+    List_of_Associations = []
+    for i,pstt in enumerate(PseudoTimeTraj):
+        inds = pstt['Trajectory']
+        #traj_nodep = nodep_original[inds,:]
+        points = pstt['Points']
+        pst = pstt['Pseudotime']
+        TrajName = 'Trajectory:'+str(pstt['Trajectory'][0])+'--'+str(pstt['Trajectory'][-1])
+        k = var_names.index(var)
+        vals = X_original[:,k]
+        spcorr = spearmanr(pst,vals[points]).correlation
+        asstup = (TrajName,var,spcorr)
+        if abs(spcorr)>Correlation_Threshold:
+            List_of_Associations.append(asstup)
+            if verbose:
+                print(i,asstup)
+            if producePlot:
+                x = pst
+                y = vals[points]
+                bincenters,wav = moving_weighted_average(x,y,step_size=1.5)
+                plt.plot(pst,y,'ro')
+                plt.plot(bincenters,fill_gaps_in_number_sequence(wav),'bo-',linewidth=10,markersize=10)
+                #plt.plot(np.linspace(0,len(inds)-1,len(inds)),traj_nodep[:,k])
+                #plt.ylim(min(y)-np.ptp(y)*0.05,max(y)+np.ptp(y)*0.05)
+                plt.xlabel('Pseudotime',fontsize=20)
+                plt.ylabel(var,fontsize=20)
+                plt.title(TrajName+', r={:2.2f}'.format(spcorr),fontsize=20)
+                plt.show()
+    return List_of_Associations
+
+
+def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,producePlot=True,verbose=False,Continuous_Regression_Type='linear',R2_Threshold=0.5):
+    # Continuous_Regression_Type can be 'linear','gpr' for Gaussian Process, 'kr' for kernel ridge
+    if var_type=='BINARY':
+        #convert back to binary vals
+        mn = min(vals)
+        mx = max(vals)
+        vals[np.where(vals==mn)] = 0
+        vals[np.where(vals==mx)] = 1
+        if len(np.unique(vals))==1:
+            regressor = None
+        else:
+            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none').fit(pseudotime, vals)
+    if var_type=='CATEGORICAL':
+        if len(np.unique(vals))==1:
+            regressor = None
+        else:
+            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none').fit(pseudotime, vals)
+    if var_type=='CONTINUOUS' or var_type=='ORDINAL':
+        if len(np.unique(vals))==1:
+            regressor = None
+        else:
+            if Continuous_Regression_Type=='gpr':
+                gp_kernel =  C(1.0, (1e-3, 1e3)) * RBF(1, (1e-2, 1e2))
+                #gp_kernel =  RBF(np.std(vals))
+                regressor = GaussianProcessRegressor(kernel=gp_kernel,alpha=np.var(vals)*2)
+                regressor.fit(pseudotime, vals)
+            if Continuous_Regression_Type=='linear':
+                regressor = LinearRegression()
+                regressor.fit(pseudotime, vals)
+    
+    r2score = 0
+    if regressor is not None:
+        r2score = r2_score(vals,regressor.predict(pseudotime))
+    
+        if producePlot and r2score>R2_Threshold:
+            plt.plot(pseudotime,vals,'ro',label='data')
+            unif_pst = np.linspace(min(pseudotime),max(pseudotime),100)
+            pred = regressor.predict(unif_pst)
+            if var_type=='BINARY' or var_type=='CATEGORICAL':
+                prob = regressor.predict_proba(unif_pst)
+                plt.plot(unif_pst,prob[:,1],'g-',linewidth=2,label='proba')    
+            if var_type=='CONTINUOUS' or var_type=='ORDINAL':
+                plt.plot(unif_pst,pred,'g-',linewidth=2,label='predicted')
+            bincenters,wav = moving_weighted_average(pseudotime,vals.reshape(-1,1),step_size=1.5)
+            plt.plot(bincenters,fill_gaps_in_number_sequence(wav),'b-',linewidth=2,label='sliding av')
+            plt.xlabel('Pseudotime',fontsize=20)
+            plt.ylabel(var_name,fontsize=20)
+            plt.title(TrajName+', r2={:2.2f}'.format(r2score),fontsize=20)
+            plt.legend(fontsize=15)
+            plt.show()
+
+    
+    return r2score, regressor
+
+def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variable_types,X_original,verbose=False,producePlot=True,R2_Threshold=0.5,Continuous_Regression_Type='linear'):
+    List_of_Associations = []
+    for i,pstt in enumerate(PseudoTimeTraj):
+        inds = pstt['Trajectory']
+        #traj_nodep = nodep_original[inds,:]
+        points = pstt['Points']
+        pst = pstt['Pseudotime']
+        pst = pst.reshape(-1,1)
+        TrajName = 'Trajectory:'+str(pstt['Trajectory'][0])+'--'+str(pstt['Trajectory'][-1])
+        k = var_names.index(var)
+        vals = X_original[points,k]
+        r2,regressor = regress_variable_on_pseudotime(pst,vals,TrajName,var,variable_types[k],producePlot=producePlot,verbose=verbose,R2_Threshold=R2_Threshold,Continuous_Regression_Type=Continuous_Regression_Type)
+        pstt[var+'_regressor'] = regressor
+        asstup = (TrajName,var,r2)
+        if r2>R2_Threshold:
+            List_of_Associations.append(asstup)
+            if verbose:
+                print(i,asstup)
+    return List_of_Associations
+
+
+def quantify_pseudotime(all_trajectories,ProjStruct,producePlot=False):
+    projval = ProjStruct['ProjectionValues']
+    edgeid = (ProjStruct['EdgeID']).astype(int)
+    edges = ProjStruct['Edges']
+    partition = ProjStruct['Partition']
+    PseudoTimeTraj = []
+    for traj in all_trajectories:
+        pst,points = pseudo_time_trajectory(traj,ProjStruct)
+        pstt = {}
+        pstt['Trajectory'] = traj
+        pstt['Points'] = points
+        pstt['Pseudotime'] = pst
+        PseudoTimeTraj.append(pstt)
+        if producePlot:
+            plt.plot(np.sort(pst))
+    return PseudoTimeTraj
+
+def project_on_tree(X,tree):
+    nodep = tree['NodePositions']
+    edges = tree['Edges'][0]
+    partition, dists = elpigraph.src.core.PartitionData(X = X, NodePositions = nodep, MaxBlockSize = 100000000, TrimmingRadius = np.inf,SquaredX = np.sum(X**2,axis=1,keepdims=1))
+    ProjStruct = elpigraph.src.reporting.project_point_onto_graph(X = X,
+                                     NodePositions = nodep,
+                                     Edges = edges,
+                                     Partition = partition)
+    #projval = ProjStruct['ProjectionValues']
+    #edgeid = (ProjStruct['EdgeID']).astype(int)
+    ProjStruct['Partition'] = partition
+    return ProjStruct
+
+def draw_pseudotime_dependence(trajectory,variable_name,variable_names,variable_types,X_original,color_line,linewidth=1,fontsize=20,draw_datapoints=False):
+    regressor = trajectory[variable_name+'_regressor']
+    if regressor is not None:
+        k = variable_names.index(variable_name)
+        mn = min(X_original[:,k])
+        mx = max(X_original[:,k])
+        pst = trajectory['Pseudotime']
+        #pst = np.unique(pst).reshape(-1,1)
+        unif_pst = np.linspace(min(pst),max(pst),100).reshape(-1,1)
+        var_type = variable_types[k]
+        if var_type=='BINARY':
+            vals = regressor.predict_proba(unif_pst)[:,1]
+        else:
+            vals = regressor.predict(unif_pst)
+            vals = (vals-mn)/(mx-mn)
+        if draw_datapoints:
+            plt.plot(pst,(X_original[trajectory['Points'],k]-mn)/(mx-mn),'ko',color=color_line)
+        plt.plot(unif_pst,vals,color=color_line,linewidth=linewidth,label=variable_name)
+        plt.xlabel('Pseudotime',fontsize=fontsize)

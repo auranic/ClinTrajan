@@ -1,5 +1,8 @@
 import trimap
 import getpass
+import os
+from os import path
+
 
 import random
 import numpy as np
@@ -20,7 +23,7 @@ from keras import backend as K
 
 def apply_panel_of_manifold_learning_methods(X,color,
                                 Color_by_branches=[],precomputed_results={},color_map='cool',ColorByFeature='',
-                                variable_names=[]):
+                                variable_names=[],ElMapFolder=''):
     viz_results = precomputed_results
     #Set figure parameters
     n_points = X.shape[0]
@@ -54,6 +57,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
             k = np.where(color2_unique==c)[0][0]
             count = color2_count[k]
             k1 = np.where(inds==k)[0][0]
+            k1 = k1%len(color_seq)
             col = color_seq[k1]
             newc.append(col)
         color2 = newc
@@ -245,16 +249,17 @@ def apply_panel_of_manifold_learning_methods(X,color,
 
     ### ELMAP ###
     #if  not onlyDraw:
-    Xproj_pd = pd.read_csv('/mnt/c/MyPrograms/__github/ElMap/tests/_elmap_proj.txt', sep='\t',header=None)
-    Xproj = Xproj_pd.to_numpy()[:,0:-1]
-    Y_ELMAP = Xproj
-    i += 1
-    ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
-    plt.scatter(Y_ELMAP[:, 0], Y_ELMAP[:, 1], c=color1, cmap=cmap,s=points_size)
-    plt.title("ELMAP",fontdict = {'fontsize' : title_fontsize})
-    ax.xaxis.set_major_formatter(NullFormatter())
-    ax.yaxis.set_major_formatter(NullFormatter())
-    plt.axis('tight')
+    if os.path.exists(ElMapFolder+'/tests/_elmap_proj.txt'):
+        Xproj_pd = pd.read_csv(ElMapFolder+'/tests/_elmap_proj.txt', sep='\t',header=None)
+        Xproj = Xproj_pd.to_numpy()[:,0:-1]
+        Y_ELMAP = Xproj
+        i += 1
+        ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
+        plt.scatter(Y_ELMAP[:, 0], Y_ELMAP[:, 1], c=color1, cmap=cmap,s=points_size)
+        plt.title("ELMAP",fontdict = {'fontsize' : title_fontsize})
+        ax.xaxis.set_major_formatter(NullFormatter())
+        ax.yaxis.set_major_formatter(NullFormatter())
+        plt.axis('tight')
 
 
     ### Autoencoder ###

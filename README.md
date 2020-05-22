@@ -43,6 +43,8 @@ The methodology is implemented in Python with some functionality using R package
 
 ## Installation
 
+For the moment the only way to use the package is to copy the .py files from the 'code' folder and make them available.
+
 ## Case studies
 
 We demonstrate application of the methodology to two clinical datasets, one of moderate size (1700 patients) and one of relatively large size (100000 patients).
@@ -51,10 +53,35 @@ We demonstrate application of the methodology to two clinical datasets, one of m
 
 The database was collected in the Krasnoyarsk Interdistrict Clinical Hospital (Russia) in 1992-1995 years. The original database and its description can be downloaded from https://leicester.figshare.com/articles/Myocardial_infarction_complications_Database/12045261/1. It contains information about 1700 patients and 110 features characterizing the clinical phenotypes and 12 features representing possible complications of the myocardial infarction disease. 
 
+Two Jupyter notebooks provides the exact protocol of the analysis of this database.
+In order to use them, download the content of the git and start the notebook from the git folder.
+
+* [QI_Infarctus.ipynb] - notebook documenting quantification and imputation of the datatable, which consists of the steps
+  1. Removing the columns containing more than 30% of missing values
+  2. Removing the rows containing more than 20% of missing values
+  3. Determining the complete part of the table
+  4. Classifying variables into types (BINARY, ORDINARY, CONTINUOUS). The categorical variables are supposed to be converted using the standard dummy coding.
+  5. Univariate variable quantification
+  6. Using the quantified complete part of the table, compute SVD of an order corresponding to the intrinsic dimension estimate
+  7. Project vectors with missing values into the space of obtained principal components, the imputed values are taken from the projection values.
+
+* [PT_Infarctus.ipynb] - notebook documenting the analysis of the imputed table, using the methodology of principal trees. It contains of the following steps:
+  1. Pre-processing the dataset by projecting it into the space of the first principal components. Conservative 'elbow rule'-based estimate is used in this case.
+  2. Defining the classes of patients, by a separate analysis of dependent (complication and lethality cause) variables, using principal trees.
+  3. Constructing the principal tree, and post-processing it (pruning short edges and extending the external branches in order to avoid the border effects).
+  4. Computing and visualizing associations of the principal tree branches with initial clusters.
+  5. Determining the 'root node' of the tree, most associated to the 'no complication' class.
+  6. Compute and visualize all trajectories from the root node to the leaf nodes.
+  7. Compute and visualize associations of the trajectories with all variables
+  8. Compute and visualize the connection of complication variables with trajectories.
+  9. Using principal tree for visualization of various variables
+  10. Applying a panel of 12 manifold learning methods to the dataset
+
+
 ### Diabetes readmission data set from UCI Machine Learning Repository
 
 The dataset represents 10 years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. It includes over 50 features representing patient and hospital outcomes. The dataset can be downloaded from UCI repository at https://archive.ics.uci.edu/ml/datasets/diabetes+130-us+hospitals+for+years+1999-2008 or from Kaggle at https://www.kaggle.com/brandao/diabetes. The data matrix contains 100000 hospitalization cases with patients suffering from diabetis characterized by 55 attributes.
 
 ## References:
 
-
+(1) [Albergante L, Mirkes E, Bac J, Chen H, Martin A, Faure L, Barillot E, Pinello L, Gorban A, Zinovyev A. Robust and scalable learning of complex intrinsic dataset geometry via ElPiGraph. 2020. Entropy 22(3):296](https://www.mdpi.com/1099-4300/22/3/296)

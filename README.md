@@ -70,7 +70,7 @@ In order to use them, download the content of the git and start the notebook fro
   7. Project vectors with missing values into the space of obtained principal components, the imputed values are taken from the projection values.
 
 * [PT_Infarctus.ipynb](PT_Infarctus.ipynb) - notebook documenting the analysis of the imputed table, using the methodology of principal trees. It contains of the following steps:
-  1. Pre-processing the dataset by projecting it into the space of the first principal components. Conservative 'elbow rule'-based estimate is used in this case.
+  1. Pre-processing the dataset by projecting it into the space of the first principal components. Conservative 'elbow rule'-based estimate for the number of top principal components is used in this case.
   2. [Defining the classes of patients](images/definition_of_classes_infarctus.png), by a separate analysis of dependent (complication and lethality cause) variables, using principal trees. Note: when viewed online, the notebook misses the image showing the introduced classification of the patients. This image can be found [here](images/definition_of_classes_infarctus.png).
   3. Constructing the principal tree, and post-processing it (pruning short edges and extending the external branches in order to avoid the border effects).
   4. Computing and visualizing associations of the principal tree branches with initial clusters.

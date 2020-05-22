@@ -65,7 +65,7 @@ In order to use them, download the content of the git and start the notebook fro
   6. Using the quantified complete part of the table, compute SVD of an order corresponding to the intrinsic dimension estimate
   7. Project vectors with missing values into the space of obtained principal components, the imputed values are taken from the projection values.
 
-* [PT_Infarctus.ipynb] - notebook documenting the analysis of the imputed table, using the methodology of principal trees. It contains of the following steps:
+* [PT_Infarctus.ipynb](PT_Infarctus.ipynb) - notebook documenting the analysis of the imputed table, using the methodology of principal trees. It contains of the following steps:
   1. Pre-processing the dataset by projecting it into the space of the first principal components. Conservative 'elbow rule'-based estimate is used in this case.
   2. Defining the classes of patients, by a separate analysis of dependent (complication and lethality cause) variables, using principal trees.
   3. Constructing the principal tree, and post-processing it (pruning short edges and extending the external branches in order to avoid the border effects).

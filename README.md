@@ -73,7 +73,7 @@ In order to use them, download the content of the git and start the notebook fro
   1. Pre-processing the dataset by projecting it into the space of the first principal components. Conservative 'elbow rule'-based estimate for the number of top principal components is used in this case.
   2. [Defining the classes of patients](images/definition_of_classes_infarctus.png), by a separate analysis of dependent (complication and lethality cause) variables, using principal trees. Note: when viewed online, the notebook misses the image showing the introduced classification of the patients. This image can be found [here](images/definition_of_classes_infarctus.png).
   3. Constructing the principal tree, and post-processing it (pruning short edges and extending the external branches in order to avoid the border effects).
-  4. Computing and visualizing associations of the principal tree branches with initial clusters.
+  4. Computing and visualizing associations of the principal tree branches with the patient classes.
   5. Determining the 'root node' of the tree, most associated to the 'no complication' class.
   6. Compute and visualize all trajectories from the root node to the leaf nodes.
   7. Compute and visualize associations of the trajectories with all variables

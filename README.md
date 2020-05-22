@@ -26,7 +26,7 @@ some important bifurcations in the development of a disease.
 Extracting cellular trajectories is a widely used methodology of data analysis in genomics, especially in studying certain highly dynamic phenomena such as differentiation or development. 
 Quantifying and visualizing clinical trajectories represents a more challenging data mining problem due to the data specificity.
 
-## Dimensionality reduction and manifold learning in clinical datasets
+## Method of elastic principal graphs (ElPiGraph) for extracting and analyzing the clinical trajectories
 
 Here we develop a semi-supervised methodology of clinical data analysis, based on constructing and exploring the properties
 of principal trees (PT), which is a non-linear generalization of Principal Component Analysis (PCA). Principal trees are 

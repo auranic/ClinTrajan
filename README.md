@@ -43,7 +43,7 @@ The methodology takes into account the specificity of clinical data by providing
 6) Visualization of clinical variables using principal trees
 7) Pseudotime plots of clinical variables along clinical trajectories
 
-The methodology is implemented in Python with some functionality using R packages.
+The methodology is implemented in Python.
 
 ## Installation
 

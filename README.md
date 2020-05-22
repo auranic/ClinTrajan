@@ -12,13 +12,15 @@ We assume that the real-life clinical data are characterized by the following fe
 3) They do not have a uniquely defined labeling (part of the clinical variables can be used to define clinical groups, 
 but this can be done in several meaningfull ways)
 
-## Clinical trajectories
+## Clinical trajectories and pseudotime
 
 We assume that any clinical dataset represents a landscape of possible patient phenotypes of various and multivariate 
 degree of clinical gravity, which can be accompanied by the details of applied treatment. 
 We also assume a possibility of existence of clinical trajectories, i.e. clinically relevant sequences of partly ordered phenotypes 
 possibly representing consequtive states of a developing disease phenotype and leading to some final states (i.e., a 
-lethal outcome). We also assume that clinical trajectories might be characterized by branching structure, representing
+lethal outcome). Each clinical trajectory can be characterized by its proper pseudotime which allows to quantitatively characterize the degree of progression along the trajectory. 
+Each clinical variable can be plotted then as a function of pseudotime for a given clinical trajectory.
+We also assume that clinical trajectories can be characterized by branching structure, representing
 some important bifurcations in the development of a disease. 
 
 Extracting cellular trajectories is a widely used methodology of data analysis in genomics, especially in studying certain highly dynamic phenomena such as differentiation or development. 
@@ -26,7 +28,7 @@ Quantifying and visualizing clinical trajectories represents a more challenging 
 
 ## Dimensionality reduction and manifold learning in clinical datasets
 
-Here we develop an semi-supervised methodology of clinical data analysis, based on constructing and exploring the properties
+Here we develop a semi-supervised methodology of clinical data analysis, based on constructing and exploring the properties
 of principal trees (PT), which is a non-linear generalization of Principal Component Analysis (PCA). Principal trees are 
 constructed using ElPiGraph method, which has been previously exploited in determining branching trajectories in various genoomics 
 datasets (in particular, in single cell omics data). 
@@ -36,8 +38,10 @@ The methodology takes into account the specificity of clinical data by providing
 1) Univariate and multi-variate quantification of nominal variables
 2) Several methods for missing values imputation including built-in benchmarking of the imputation methods
 3) Set of state-of-the-art methods for manifold learning
-4) Extracting clinical trajectories using principal tree approach
-5) Computational tools for exploring the clinical datasets using the principal tree approach
+4) Partitioning the data accordingly to the branches of the principal tree (analogue of clustering) and associating the branches to clinical variables.
+5) Extracting clinical trajectories using principal tree approach and associating the trajectories to clinical variables.
+6) Visualization of clinical variables using principal trees
+7) Pseudotime plots of clinical variables along clinical trajectories
 
 The methodology is implemented in Python with some functionality using R packages.
 

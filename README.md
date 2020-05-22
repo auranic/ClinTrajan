@@ -56,7 +56,7 @@ The database was collected in the Krasnoyarsk Interdistrict Clinical Hospital (R
 Two Jupyter notebooks provides the exact protocol of the analysis of this database.
 In order to use them, download the content of the git and start the notebook from the git folder.
 
-* [QI_Infarctus.ipynb] - notebook documenting quantification and imputation of the datatable, which consists of the steps
+* [QI_Infarctus.ipynb](QI_Infarctus.ipynb) - notebook documenting quantification and imputation of the datatable, which consists of the steps
   1. Removing the columns containing more than 30% of missing values
   2. Removing the rows containing more than 20% of missing values
   3. Determining the complete part of the table

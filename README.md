@@ -43,7 +43,7 @@ The methodology is implemented in Python with some functionality using R package
 
 ## Installation
 
-For the moment the only way to use the package is to copy the .py files from the 'code' folder and make them available.
+For the moment the only way to use the package is to copy the .py files from the 'code' folder and make them available in the Python path.
 
 ## Case studies
 

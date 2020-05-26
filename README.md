@@ -17,7 +17,7 @@ but this can be done in several meaningfull ways)
 We assume that any clinical dataset represents a landscape of possible patient phenotypes of various and multivariate 
 degree of clinical gravity, which can be accompanied by the details of applied treatment. 
 We also assume a possibility of existence of clinical trajectories, i.e. clinically relevant sequences of partly ordered phenotypes 
-possibly representing consequtive states of a developing disease phenotype and leading to some final states (i.e., a 
+possibly representing consecutive states of a developing disease phenotype and leading to some final states (i.e., a 
 lethal outcome). Each clinical trajectory can be characterized by its proper pseudotime which allows to quantitatively characterize the degree of progression along the trajectory. 
 Each clinical variable can be plotted then as a function of pseudotime for a given clinical trajectory.
 We also assume that clinical trajectories can be characterized by branching structure, representing

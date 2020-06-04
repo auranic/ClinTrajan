@@ -363,6 +363,5 @@ def apply_panel_of_manifold_learning_methods(X,color,
     plt.axis('tight')
 
     plt.tight_layout()
-    plt.show()
     
     return viz_results

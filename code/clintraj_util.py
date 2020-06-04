@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import statsmodels.api as sm
 from scipy.stats import chi2_contingency
+import scipy.stats
 from statsmodels.formula.api import ols
 from numpy.lib.stride_tricks import as_strided
 import math
@@ -36,8 +37,16 @@ def associate_with_categorical_var(categorical_var,variable_name,variable,var_ty
                     if verbose:
                         print(str(categorical_vals[i])+'\t'+str(var_vals[j])+'\t{}'.format(devs[i,j]))
                     list_of_associations.append((categorical_vals[i],var_vals[j],devs[i,j]))
+        if produce_plot and len(list_of_associations)>0:
+            unique_vals = np.unique(categorical_var)
+            d = {'BRANCH NUMBER': unique_vals, 'observed': table.to_numpy()[:,1], 'expected': expected[:,1]} 
+            df1 = pd.DataFrame(data=d)
+            df1.plot(x="BRANCH NUMBER", y=["observed", "expected"], kind="bar")
+            plt.title(variable_name,fontsize=20)
+            plt.show()
     if var_type=='CONTINUOUS' or var_type=='ORDINAL':
-        d = {'CATEGORICAL': categorical_var, 'VAR': variable}        
+        variable_normalized = scipy.stats.zscore(variable)
+        d = {'CATEGORICAL': categorical_var, 'VAR': variable_normalized}        
         df = pd.DataFrame(data=d)
         categorical_vals = np.unique(categorical_var)
         #df = df.get_dummies(['CATEGORICAL'])
@@ -158,10 +167,28 @@ def get_matrix_of_association_scores(associations):
 
 def get_standard_color_seq():
     color_seq = [[1,0,0],[0,1,0],[0,0,1],[0,1,1],[1,0,1],[1,1,0],
-             [1,0,0.5],[1,0.5,0],[0.5,0,1],[0.5,1,0],
-             [0.5,0.5,1],[0.5,1,0.5],[1,0.5,0.5],
-             [0,0.5,0.5],[0.5,0,0.5],[0.5,0.5,0],[0.5,0.5,0.5],[0,0,0.5],[0,0.5,0],[0.5,0,0],
-             [0,0.25,0.5],[0,0.5,0.25],[0.25,0,0.5],[0.25,0.5,0],[0.5,0,0.25],[0.5,0.25,0],
-             [0.25,0.25,0.5],[0.25,0.5,0.25],[0.5,0.25,0.25],[0.25,0.25,0.5],[0.25,0.5,0.25],
-             [0.25,0.25,0.5],[0.25,0.5,0.25],[0.5,0,0.25],[0.5,0.25,0.25]]
+             [1,0,0.5],[1,0.5,0],[0.5,0,1],
+             [0.5,1,0],[0.5,0.5,1],[0.5,1,0.5],
+             [1,0.5,0.5],[0,0.5,0.5],[0.5,0,0.5],
+             [0.5,0.5,0],[0.5,0.5,0.5],[0,0,0.5],
+             [0,0.5,0],[0.5,0,0],[0,0.25,0.5],
+             [0,0.5,0.25],[0.25,0,0.5],[0.25,0.5,0],
+             [0.5,0,0.25],[0.5,0.25,0],[0.25,0.25,0.5],
+             [0.25,0.5,0.25],[0.5,0.25,0.25],[0.25,0.25,0.5],
+             [0.25,0.5,0.25],[0.25,0.25,0.5],[0.25,0.5,0.25],
+             [0.5,0,0.25],[0.5,0.25,0.25],
+             [1,0,0.25],[1,0.25,0],[1,0.25,0.25],
+             [0,1,0.25],[0.25,1,0],[0.25,1,0.25],
+             [0,0.25,1],[0.25,0,1],[0.25,0.25,1],
+             ]
     return color_seq
+
+def remove_constant_columns_from_dataframe(df):
+    # first column is assumed to be row id, not a value
+    X = df[df.columns[1:]].to_numpy()
+    inds = np.where(np.std(X,axis=0)>0)[0]
+    print('Removing ',X.shape[1]-len(inds),'columns')
+    inds=inds+1
+    inds = np.array([0]+list(inds))
+    df = df[df.columns[inds]]
+    return df

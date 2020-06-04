@@ -46,7 +46,8 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
                               verbose=False,
                               Visualize_Branch_Class_Associations = [], #list_of_branch_class_associations
                               cmap = 'cool',scatter_parameter=0.03,highlight_subset=[],
-                              add_color_bar=False):
+                              add_color_bar=False,
+                              vmin=-1,vmax=-1):
 
     nodep = tree_elpi['NodePositions']
     nodep_original = np.matmul(nodep,principal_component_vectors[:,0:X.shape[1]].T)+mean_vector
@@ -170,8 +171,11 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
         rsgn = random_sign()
         x[i] = x_coo+vey*r*rsgn
         y[i] = y_coo-vex*r*rsgn
-
-    plt.scatter(x,y,c=color2,cmap=cmap,s=points_size, vmin=min(color2), vmax=max(color2))
+    if vmin<0:
+        vmin=min(color2)
+    if vmax<0:
+        vmax=max(color2)
+    plt.scatter(x,y,c=color2,cmap=cmap,s=points_size, vmin=vmin, vmax=vmax)
     if showPointNumbers:
         for j in range(len(X)):
             plt.text(x[j],y[j],j)
@@ -241,6 +245,14 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
             plt.text(idx[i,0],idx[i,1],str(i),FontSize=20,bbox=dict(facecolor='grey', alpha=0.5))
 
     #plt.axis('off')
+
+def convert_elpigraph_to_igraph(elpigraph):
+    edges = elpigraph['Edges'][0]
+    nodes_positions = elpigraph['NodePositions']
+    g = igraph.Graph()
+    g.add_vertices(len(nodes_positions))
+    g.add_edges(edges)
+    return g
 
 
 def partition_data_by_tree_branches(X,tree_elpi):
@@ -699,6 +711,8 @@ def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variab
         r2,regressor = regress_variable_on_pseudotime(pst,vals,TrajName,var,variable_types[k],producePlot=producePlot,verbose=verbose,R2_Threshold=R2_Threshold,Continuous_Regression_Type=Continuous_Regression_Type)
         pstt[var+'_regressor'] = regressor
         asstup = (TrajName,var,r2)
+        #if verbose:
+        #    print(var,'R2',r2)
         if r2>R2_Threshold:
             List_of_Associations.append(asstup)
             if verbose:
@@ -736,12 +750,13 @@ def project_on_tree(X,tree):
     ProjStruct['Partition'] = partition
     return ProjStruct
 
-def draw_pseudotime_dependence(trajectory,variable_name,variable_names,variable_types,X_original,color_line,linewidth=1,fontsize=20,draw_datapoints=False):
+def draw_pseudotime_dependence(trajectory,variable_name,variable_names,variable_types,X_original,color_line,linewidth=1,fontsize=20,draw_datapoints=False,label=None,linestyle=None):
     regressor = trajectory[variable_name+'_regressor']
+    k = variable_names.index(variable_name)
+    mn = min(X_original[:,k])
+    mx = max(X_original[:,k])
+    vals = None
     if regressor is not None:
-        k = variable_names.index(variable_name)
-        mn = min(X_original[:,k])
-        mx = max(X_original[:,k])
         pst = trajectory['Pseudotime']
         #pst = np.unique(pst).reshape(-1,1)
         unif_pst = np.linspace(min(pst),max(pst),100).reshape(-1,1)
@@ -753,5 +768,10 @@ def draw_pseudotime_dependence(trajectory,variable_name,variable_names,variable_
             vals = (vals-mn)/(mx-mn)
         if draw_datapoints:
             plt.plot(pst,(X_original[trajectory['Points'],k]-mn)/(mx-mn),'ko',color=color_line)
-        plt.plot(unif_pst,vals,color=color_line,linewidth=linewidth,label=variable_name)
+        if label is None:
+            label = variable_name
+        if linestyle is None:
+            linestyle = '-'
+        plt.plot(unif_pst,vals,color=color_line,linewidth=linewidth,label=label,linestyle=linestyle)
         plt.xlabel('Pseudotime',fontsize=fontsize)
+    return vals

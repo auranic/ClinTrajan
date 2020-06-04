@@ -1,4 +1,4 @@
-# Methodology and software for quantifying trajectories in clinical datasets
+# Methodology and software for quantifying pseudotemporal trajectories in clinical datasets
 
 ## Specificity of clinical datasets
 

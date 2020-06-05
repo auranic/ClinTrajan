@@ -64,7 +64,7 @@ In order to use them, download the content of the git and start the notebook fro
   1. Removing the columns containing more than 30% of missing values
   2. Removing the rows containing more than 20% of missing values
   3. Determining the complete part of the table
-  4. Classifying variables into types (BINARY, ORDINARY, CONTINUOUS). The categorical variables are supposed to be converted using the standard dummy coding.
+  4. Classifying variables into types (BINARY, ORDINAL, CONTINUOUS). The categorical variables are supposed to be converted using the standard dummy coding.
   5. Univariate variable quantification
   6. Using the quantified complete part of the table, compute SVD of an order corresponding to the intrinsic dimension estimate
   7. Project vectors with missing values into the space of obtained principal components, the imputed values are taken from the projection values.

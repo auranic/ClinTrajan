@@ -1,4 +1,4 @@
-# Methodology and software for quantifying trajectories in clinical datasets
+# Methodology and software for quantifying pseudotemporal trajectories in clinical datasets
 
 ## Specificity of clinical datasets
 
@@ -35,8 +35,8 @@ datasets (in particular, in single cell omics data).
 
 The methodology takes into account the specificity of clinical data by providing tools for the following steps of clinical data analysis:
 
-1) Univariate and multi-variate quantification of nominal variables
-2) Several methods for missing values imputation including built-in benchmarking of the imputation methods
+1) Univariate and multi-variate quantification of nominal variables, including the original implementation of optimal scaling for ordinal variables
+2) Several original methods for missing values imputation based on Singular Value Decomposition
 3) Set of state-of-the-art methods for manifold learning
 4) Partitioning the data accordingly to the branches of the principal tree (analogue of clustering) and associating the branches to clinical variables.
 5) Extracting clinical trajectories using principal tree approach and associating the trajectories to clinical variables.
@@ -64,7 +64,7 @@ In order to use them, download the content of the git and start the notebook fro
   1. Removing the columns containing more than 30% of missing values
   2. Removing the rows containing more than 20% of missing values
   3. Determining the complete part of the table
-  4. Classifying variables into types (BINARY, ORDINARY, CONTINUOUS). The categorical variables are supposed to be converted using the standard dummy coding.
+  4. Classifying variables into types (BINARY, ORDINAL, CONTINUOUS). The categorical variables are supposed to be converted using the standard dummy coding.
   5. Univariate variable quantification
   6. Using the quantified complete part of the table, compute SVD of an order corresponding to the intrinsic dimension estimate
   7. Project vectors with missing values into the space of obtained principal components, the imputed values are taken from the projection values.

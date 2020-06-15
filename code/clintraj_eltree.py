@@ -43,11 +43,13 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
                               Color_by_partitioning = False,
                               visualize_partition = [],
                               Transparency_Alpha = 0.2,
+                              Transparency_Alpha_points = 1,
                               verbose=False,
                               Visualize_Branch_Class_Associations = [], #list_of_branch_class_associations
                               cmap = 'cool',scatter_parameter=0.03,highlight_subset=[],
                               add_color_bar=False,
-                              vmin=-1,vmax=-1):
+                              vmin=-1,vmax=-1,
+                              percentile_contraction=20):
 
     nodep = tree_elpi['NodePositions']
     nodep_original = np.matmul(nodep,principal_component_vectors[:,0:X.shape[1]].T)+mean_vector
@@ -110,7 +112,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
     X_proj = ProjStruct['X_projected']
 
     dist2proj = np.sum(np.square(X-X_proj),axis=1)
-    shift = np.percentile(dist2proj,20)
+    shift = np.percentile(dist2proj,percentile_contraction)
     dist2proj = dist2proj-shift
 
     #Create graph
@@ -142,6 +144,8 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
         x_coos = np.concatenate((idx[edges[edgeid[i],0],[0]],idx[edges[edgeid[i],1],[0]]))
         y_coos = np.concatenate((idx[edges[edgeid[i],0],[1]],idx[edges[edgeid[i],1],[1]]))
 
+        projected_on_edge = False
+  
         if projval[i]<0:
             #project to 0% of the edge (first node)
             x_coo = x_coos[0] 
@@ -154,7 +158,12 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
             #project to appropriate % of the edge
             x_coo = x_coos[0] + (x_coos[1]-x_coos[0])*projval[i]
             y_coo = y_coos[0] + (y_coos[1]-y_coos[0])*projval[i]
-    
+            projected_on_edge = True
+
+        #if projected_on_edge:
+        #     color2[i]=0
+        #else:
+        #     color2[i]=1    
         #random angle
         #alpha = 2 * np.pi * np.random.random()
         #random scatter to appropriate distance 
@@ -163,8 +172,13 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
 	# we rather position the point close to project and put
 	# it at distance r orthogonally to the edge 
 	# on a random side of the edge 
+        # However, if projection was on a node then we scatter 
+        # in random direction
         vex = x_coos[1]-x_coos[0]
         vey = y_coos[1]-y_coos[0]
+        if not projected_on_edge:
+            vex = np.random.random()-0.5
+            vey = np.random.random()-0.5
         vn = np.sqrt(vex*vex+vey*vey)
         vex = vex/vn
         vey = vey/vn
@@ -175,7 +189,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
         vmin=min(color2)
     if vmax<0:
         vmax=max(color2)
-    plt.scatter(x,y,c=color2,cmap=cmap,s=points_size, vmin=vmin, vmax=vmax)
+    plt.scatter(x,y,c=color2,cmap=cmap,s=points_size, vmin=vmin, vmax=vmax,alpha=Transparency_Alpha_points)
     if showPointNumbers:
         for j in range(len(X)):
             plt.text(x[j],y[j],j)
@@ -187,6 +201,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
 
 
     #Scatter nodes
+    tree_elpi['NodePositions2D'] = idx
     plt.scatter(idx[:,0],idx[:,1],s=node_size,c='black',alpha=.8)
 
     #Associate edge width to a feature
@@ -643,7 +658,7 @@ def correlation_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,X_ori
     return List_of_Associations
 
 
-def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,producePlot=True,verbose=False,Continuous_Regression_Type='linear',R2_Threshold=0.5):
+def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,producePlot=True,verbose=False,Continuous_Regression_Type='linear',R2_Threshold=0.5,max_sample=-1,alpha_factor=2):
     # Continuous_Regression_Type can be 'linear','gpr' for Gaussian Process, 'kr' for kernel ridge
     if var_type=='BINARY':
         #convert back to binary vals
@@ -665,10 +680,22 @@ def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,pr
             regressor = None
         else:
             if Continuous_Regression_Type=='gpr':
-                gp_kernel =  C(1.0, (1e-3, 1e3)) * RBF(1, (1e-2, 1e2))
-                #gp_kernel =  RBF(np.std(vals))
-                regressor = GaussianProcessRegressor(kernel=gp_kernel,alpha=np.var(vals)*2)
-                regressor.fit(pseudotime, vals)
+                # subsampling if needed
+                pst = pseudotime.copy()
+                vls = vals.copy()
+                if max_sample>0:
+                    l = list(range(len(vals)))
+                    random.shuffle(l)
+                    index_value = random.sample(l, min(max_sample,len(vls)))
+                    pst = pst[index_value]
+                    vls = vls[index_value]
+                if len(np.unique(vls))>1:
+                     gp_kernel =  C(1.0, (1e-3, 1e3)) * RBF(1, (1e-2, 1e2))
+                     #gp_kernel =  RBF(np.std(vals))
+                     regressor = GaussianProcessRegressor(kernel=gp_kernel,alpha=np.var(vls)*alpha_factor)
+                     regressor.fit(pst, vls)
+                else:
+                     regressor = None
             if Continuous_Regression_Type=='linear':
                 regressor = LinearRegression()
                 regressor.fit(pseudotime, vals)
@@ -697,7 +724,7 @@ def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,pr
     
     return r2score, regressor
 
-def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variable_types,X_original,verbose=False,producePlot=True,R2_Threshold=0.5,Continuous_Regression_Type='linear'):
+def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variable_types,X_original,verbose=False,producePlot=True,R2_Threshold=0.5,Continuous_Regression_Type='linear',max_sample=1000,alpha_factor=2):
     List_of_Associations = []
     for i,pstt in enumerate(PseudoTimeTraj):
         inds = pstt['Trajectory']
@@ -708,7 +735,7 @@ def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variab
         TrajName = 'Trajectory:'+str(pstt['Trajectory'][0])+'--'+str(pstt['Trajectory'][-1])
         k = var_names.index(var)
         vals = X_original[points,k]
-        r2,regressor = regress_variable_on_pseudotime(pst,vals,TrajName,var,variable_types[k],producePlot=producePlot,verbose=verbose,R2_Threshold=R2_Threshold,Continuous_Regression_Type=Continuous_Regression_Type)
+        r2,regressor = regress_variable_on_pseudotime(pst,vals,TrajName,var,variable_types[k],producePlot=producePlot,verbose=verbose,R2_Threshold=R2_Threshold,Continuous_Regression_Type=Continuous_Regression_Type, max_sample=max_sample,alpha_factor=alpha_factor)
         pstt[var+'_regressor'] = regressor
         asstup = (TrajName,var,r2)
         #if verbose:
@@ -775,3 +802,46 @@ def draw_pseudotime_dependence(trajectory,variable_name,variable_names,variable_
         plt.plot(unif_pst,vals,color=color_line,linewidth=linewidth,label=label,linestyle=linestyle)
         plt.xlabel('Pseudotime',fontsize=fontsize)
     return vals
+
+def add_pie_charts_tree(ax,tree,values,color_seq,scale=1):
+    nodep = tree['NodePositions']
+    edges = tree['Edges'][0]
+    g=nx.Graph()
+    g.add_edges_from(edges)
+    pos = nx.kamada_kawai_layout(g,scale=2)
+    idx=np.array([pos[j] for j in range(len(pos))])
+    add_pie_charts(ax,idx,values,color_seq,scale=scale)
+
+def add_pie_charts(ax,node_positions2d,values,color_seq,scale=1):
+    df = pd.DataFrame({'CLASS':values})
+    vals_unique_df = df.CLASS.value_counts()
+    vals_unique = vals_unique_df.index.to_list()
+    vals_unique_freq = vals_unique_df.to_numpy()
+    print(vals_unique,vals_unique_freq)
+
+    for i in range(node_positions2d.shape[0]):
+        inode = np.where(partition==i)
+        dfi = df.loc[partition==i]
+        node_valunique_df = dfi.CLASS.value_counts()
+        node_valunique = node_valunique_df.index.to_list()
+        node_valunique_freq = node_valunique_df.to_numpy()
+        freq_sum = np.sum(node_valunique_freq)
+        freq = len(vals_unique)*[0]
+        for j,v in enumerate(node_valunique):
+            freq[vals_unique.index(v)] = node_valunique_freq[j]/freq_sum
+        #print(i,':',node_valunique,node_valunique_freq)
+        #print(i,':',freq)
+        draw_pie(ax,freq,color_seq,X=node_positions2d[i,0],Y=node_positions2d[i,1],size=scale*len(inode[0]))
+
+def draw_pie(ax,ratios,colors,X=0, Y=0, size = 1000):
+    N = len(ratios)
+    xy = []
+    start = 0.
+    for ratio in ratios:
+        x = [0] + np.cos(np.linspace(2*math.pi*start,2*math.pi*(start+ratio), 30)).tolist()
+        y = [0] + np.sin(np.linspace(2*math.pi*start,2*math.pi*(start+ratio), 30)).tolist()
+        xy1 = list(zip(x,y))
+        xy.append(xy1)
+        start += ratio
+    for i, xyi in enumerate(xy):
+        ax.scatter([X],[Y] , marker=xyi, s=size, facecolor=colors[i] )

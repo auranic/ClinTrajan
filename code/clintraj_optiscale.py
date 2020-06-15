@@ -90,12 +90,12 @@ def gradient_Q2(X,var_types):
         grad_cik.append(gk)
     return grad_cik
 
-def update_quantification_table(cik,grad_cik,learning_step=None):
+def update_quantification_table(cik,grad_cik,learning_step=None,fraction_max_step=0.9):
     # takes the old quantification table and updates it using the gradient,
     # the gradient step is automatically evaluated if not specified
     cik_new = []
     if learning_step is None:
-        learning_step = estimate_learning_step(cik,grad_cik)
+        learning_step = estimate_learning_step(cik,grad_cik,fraction_max_step=fraction_max_step)
         cik_new,learning_step = update_quantification_table(cik,grad_cik,learning_step)
         #print('Learning_step',learning_step)
         while not is_quantification_table_monotonic(cik_new)[0]:
@@ -110,7 +110,7 @@ def update_quantification_table(cik,grad_cik,learning_step=None):
     return cik_new,learning_step
     
 
-def estimate_learning_step(cik,grad_cik):
+def estimate_learning_step(cik,grad_cik,fraction_max_step=0.9):
     estimated_step = 100000
     for i in range(len(cik)):
         li = cik[i].shape[0]
@@ -128,7 +128,7 @@ def estimate_learning_step(cik,grad_cik):
                         max_step = (cik[i][j]-cik[i][j+1])/grad_coord
                         if max_step<estimated_step:
                             estimated_step=max_step
-    return estimated_step*0.9
+    return estimated_step*fraction_max_step
     
 
 def update_matrix_with_new_quantification(X,var_types, cik_new,verbose=True):
@@ -162,7 +162,7 @@ def is_quantification_table_monotonic(cik):
 def strictly_increasing(L):
     return all(x<y for x, y in zip(L, L[1:]))
 
-def optimal_scaling(X,var_types,verbose=False,producePlots=True,max_num_iterations = 100,tolerance=1e-5,vmax=1):
+def optimal_scaling(X,var_types,verbose=False,producePlots=True,max_num_iterations = 100,tolerance=1e-5,vmax=1,fraction_max_step=0.9):
     Q2 = pairwise_corr_sum_Q2(X)
     if(verbose):
         print('\n','Initial Q2:',Q2)
@@ -197,7 +197,7 @@ def optimal_scaling(X,var_types,verbose=False,producePlots=True,max_num_iteratio
         grad_cik = gradient_Q2(X,var_types)
         #print('Gradient:',grad_cik)
         #print('Update the quantification...')
-        cik_new,learning_step = update_quantification_table(cik,grad_cik)
+        cik_new,learning_step = update_quantification_table(cik,grad_cik,fraction_max_step=fraction_max_step)
         Learning_rate.append(learning_step)
         #print('Checking monotonicity...')
         monotone,delta = is_quantification_table_monotonic(cik_new)

@@ -192,3 +192,25 @@ def remove_constant_columns_from_dataframe(df):
     inds = np.array([0]+list(inds))
     df = df[df.columns[inds]]
     return df
+
+def get_colorseq_for_column(df,column_name,color_seq=None):
+    stcol = color_seq
+    if color_seq is None:
+        stcol = get_standard_color_seq()
+    vals_unique_df = df[column_name].value_counts()
+    vals_unique = vals_unique_df.index.to_list()
+    vals_unique_freq = vals_unique_df.to_numpy()
+    vals = df[column_name].to_list()
+    new_vals = [stcol[vals_unique.index(val)] for val in vals]
+    return new_vals, vals_unique,vals_unique_freq
+        
+def brokenstick_distribution(dim):
+    distr = np.zeros(dim)
+    for i in range(0,dim):
+        distr[i]=0
+        for j in range(i,dim):
+            distr[i]=distr[i]+1/(j+1)
+        distr[i]=distr[i]/dim
+    return distr
+
+

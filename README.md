@@ -57,7 +57,7 @@ We demonstrate application of the methodology to two clinical datasets, one of m
 
 The database was collected in the Krasnoyarsk Interdistrict Clinical Hospital (Russia) in 1992-1995 years. The original database and its description can be downloaded from https://leicester.figshare.com/articles/Myocardial_infarction_complications_Database/12045261/1. It contains information about 1700 patients and 110 features characterizing the clinical phenotypes and 12 features representing possible complications of the myocardial infarction disease. 
 
-Two Jupyter notebooks provides the exact protocol of the analysis of this database.
+Two Jupyter notebooks provide the exact protocol of the analysis of this database.
 In order to use them, download the content of the git and start the notebook from the git folder.
 
 * [QI_Infarctus.ipynb](QI_Infarctus.ipynb) - notebook documenting quantification and imputation of the datatable, which consists of the steps
@@ -85,6 +85,14 @@ In order to use them, download the content of the git and start the notebook fro
 ### Diabetes readmission data set from UCI Machine Learning Repository
 
 The dataset represents 10 years (1999-2008) of clinical care at 130 US hospitals and integrated delivery networks. It includes over 50 features representing patient and hospital outcomes. The dataset can be downloaded from UCI repository at https://archive.ics.uci.edu/ml/datasets/diabetes+130-us+hospitals+for+years+1999-2008 or from Kaggle at https://www.kaggle.com/brandao/diabetes. The data matrix contains 100000 hospitalization cases with patients suffering from diabetis characterized by 55 attributes.
+
+Three Jupyter notebooks provide the exact protocol of the analysis of this database.
+In order to use them, download the content of the git and start the notebook from the git folder.
+
+* [Set_up_Diabetes_Data_for_Modeling.ipynb](Set_up_Diabetes_Data_for_Modeling.ipynb) - notebook providing the encoding of the diabetes readmission dataset
+* [QI_Diabetes.ipynb](QI_Diabetes.ipynb) - notebook providing the details of quantification of the diabetes dataset
+* [PT_Diabetes.ipynb](PT_Diabetes.ipynb) - notebook providing the details of the analysis of clinical trajectories for the diabetes dataset
+
 
 ## References:
 

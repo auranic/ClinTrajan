@@ -162,13 +162,14 @@ def detect_variable_type(df,Max_Number_Of_Ordinal_Values=10,verbose=True):
 
     for col in df.columns[1:]: 
         vals = np.sort(df[col].unique())
+        #print(col,vals)
         vals = [x for x in vals if str(x) != 'nan']
         tp = 'UNKNOWN'
         # NaNs must be 
-        if len(vals)==2:
+        if len(vals)==2 or len(vals)==1:
             tp = 'BINARY'
             binary.append(col)
-        if len(vals)>10:
+        if len(vals)>Max_Number_Of_Ordinal_Values:
             tp = 'CONTINUOUS'
             continuous.append(col)
         if len(vals)>2 and len(vals)<=Max_Number_Of_Ordinal_Values:

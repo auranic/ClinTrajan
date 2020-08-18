@@ -579,26 +579,32 @@ def pseudo_time(root_node,point_index,traj,projval,edgeid,edges):
     traja = np.array(traj)
     i1 = 1000000
     i2 = 1000000
-    if edges[edgeid_x][0] in traja:
+    if (edges[edgeid_x][0] in traja) & (edges[edgeid_x][1] in traja):
         i1 = np.where(traja==edges[edgeid_x][0])[0][0]
-    if edges[edgeid_x][1] in traja:
         i2 = np.where(traja==edges[edgeid_x][1])[0][0]
     i = min(i1,i2)
-    pstime = i+proj_val_x
+    if i==i1:
+        pstime = i1+proj_val_x
+    else:
+        pstime = i1-proj_val_x
+    if (i1>100) | (i2>100):
+         print('Edgeid_x',edgeid_x,'[0]',edges[edgeid_x][0],'[1]',edges[edgeid_x][1])
+         print('proj_val_x',proj_val_x)
+         print('traja',traja,'\n')
     return pstime
 
-def pseudo_time_trajectory(traj,ProjStruct):
+def pseudo_time_trajectory(traj_vertices,traj_edges,ProjStruct):
     projval = ProjStruct['ProjectionValues']
     edgeid = (ProjStruct['EdgeID']).astype(int)
     edges = ProjStruct['Edges']
     partition = ProjStruct['Partition']
     traj_points = np.zeros(0,'int32')
-    for p in traj:
-        traj_points = np.concatenate((traj_points,np.where(partition==p)[0]))
+    for p in traj_edges:
+        traj_points = np.concatenate((traj_points,np.where(edgeid==p)[0]))
     #print(len(traj_points))
     pst = np.zeros(len(traj_points))
     for i,p in enumerate(traj_points):
-        pst[i] = pseudo_time(traj[0],p,traj,projval,edgeid,edges)
+        pst[i] = pseudo_time(traj_vertices[0],p,traj_vertices,projval,edgeid,edges)
     return pst,traj_points
 
 def extract_trajectories(tree,root_node,verbose=False):
@@ -611,11 +617,13 @@ def extract_trajectories(tree,root_node,verbose=False):
     leaf_nodes = [i for i,d in enumerate(degs) if d==1]
     if verbose:
         print(len(leaf_nodes),'trajectories found')
-    all_trajectories = []
+    all_trajectories_vertices = []
+    all_trajectories_edges = []
     for lf in leaf_nodes:
         path_vertices=g.get_shortest_paths(root_node,to=lf,output='vpath')
-        all_trajectories.append(path_vertices[0])
+        all_trajectories_vertices.append(path_vertices[0])
         path_edges=g.get_shortest_paths(root_node,to=lf,output='epath')
+        all_trajectories_edges.append(path_edges[0])
         if verbose:
             print('Vertices:',path_vertices)
             print('Edges:',path_edges)
@@ -625,7 +633,7 @@ def extract_trajectories(tree,root_node,verbose=False):
         if verbose:
             print('Edges:',ped)
         # compute pseudotime along each path
-    return all_trajectories
+    return all_trajectories_vertices, all_trajectories_edges
 
 def correlation_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,X_original,verbose=False,producePlot=False,Correlation_Threshold=0.5):
     List_of_Associations = []
@@ -747,16 +755,17 @@ def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variab
     return List_of_Associations
 
 
-def quantify_pseudotime(all_trajectories,ProjStruct,producePlot=False):
+def quantify_pseudotime(all_trajectories_vertices,all_trajectories_edges,ProjStruct,producePlot=False):
     projval = ProjStruct['ProjectionValues']
     edgeid = (ProjStruct['EdgeID']).astype(int)
     edges = ProjStruct['Edges']
     partition = ProjStruct['Partition']
     PseudoTimeTraj = []
-    for traj in all_trajectories:
-        pst,points = pseudo_time_trajectory(traj,ProjStruct)
+    for i,traj in enumerate(all_trajectories_vertices):
+        pst,points = pseudo_time_trajectory(traj,all_trajectories_edges[i],ProjStruct)
         pstt = {}
         pstt['Trajectory'] = traj
+        pstt['Trajectory_Edges'] = all_trajectories_edges[i]
         pstt['Points'] = points
         pstt['Pseudotime'] = pst
         PseudoTimeTraj.append(pstt)

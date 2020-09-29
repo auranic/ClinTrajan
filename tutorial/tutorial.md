@@ -18,6 +18,9 @@ The quantification functions of ClinTrajan are stored in the module **clintraj_q
 
 ```
 import pandas as pd
+import numpy as np
+import scipy.stats
+import matplotlib.pyplot as plt
 from clintraj_qi import *
 ```
 
@@ -48,7 +51,7 @@ display(dfq_imputed)
 
 This function produces the following output:
 
-![](https://github.com/auranic/ClinTrajan/blob/master/images/imputation_svd.png =700x)
+![](https://github.com/auranic/ClinTrajan/blob/master/images/imputation_svd.png)
 
 
 
@@ -56,10 +59,6 @@ This function produces the following output:
 
 
 
-Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about StackEdit, you can read me. If you want to play with Markdown, you can edit me. Once you have finished with me, you can create new files by opening the **file explorer** on the left corner of the navigation bar.
-
-
-# Files
 
 StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
 

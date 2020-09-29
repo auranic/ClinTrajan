@@ -48,7 +48,7 @@ display(dfq_imputed)
 
 This function produces the following output:
 
-![](https://github.com/auranic/ClinTrajan/blob/master/images/imputation_svd.png)
+![](https://github.com/auranic/ClinTrajan/blob/master/images/imputation_svd.png =700x)
 
 
 

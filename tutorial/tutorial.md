@@ -4,8 +4,8 @@
 
 Application of ClinTrajan to a clinical dataset consists in two parts:
 
-1. [Quantification of the data]()
-2. [Application of ElPiGraph]() and  [downstream analyses]()
+1. [Quantification of the data](##quantification-of-the-data)
+2. [Application of ElPiGraph](##application-of-elpigraph-to-quantify-branching-pseudotime) and  [downstream analyses](###downstream-analyses-using-elpigraph)
 
 Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications]().  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way is to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutorial.ipynb). Alternatively, one can copy-paste and run the commands in any convinient Python environment. 
 
@@ -134,6 +134,8 @@ visualize_eltree_with_data(tree_extended,X,X_original,v,mean_val,'k',variable_na
 plt.show()
 ```
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree_segments.png)
+
+### Downstream analyses using ElPiGraph
 
 Now let us visualize something more interesting, using the principal tree. We will visualize all lethal cases of myocardial infarction complications, and by the thickness of the tree edges, we will visualize the mortality trend along various clinical trajectories. Note that in our table the variable *LET_IS_0* means *'no lethal outcome'*!
 

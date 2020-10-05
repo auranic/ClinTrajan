@@ -1,6 +1,6 @@
 # Methodology and software for quantifying pseudotemporal trajectories in clinical datasets
 
-## Specificity of clinical datasets
+## Clinical datasets
 
 Large clinical datasets are becoming increasingly available for systematic mining the associations between phenotypic variables,
 characterizing a particular disease. Specific properties of the clinical datasets represent challenges for applying the 
@@ -12,7 +12,7 @@ We assume that the real-life clinical data are characterized by the following fe
 3) They do not have a uniquely defined labeling (part of the clinical variables can be used to define clinical groups, 
 but this can be done in several meaningfull ways)
 
-## Clinical trajectories and pseudotime
+## Clinical trajectories, pseudotime, and dynamical phenotyping of synchronic data
 
 We assume that any clinical dataset represents a landscape of possible patient phenotypes of various and multivariate 
 degree of clinical gravity, which can be accompanied by the details of applied treatment. 
@@ -47,7 +47,11 @@ The methodology is implemented in Python.
 
 ## Installation
 
-For the moment the only way to use the package is to copy the .py files from the 'code' folder and make them available in the Python path.
+For the moment the only way to use the package is to copy the .py files from the 'code' folder and make them available in the Python path
+
+## Tutorial
+
+A simplified tutorial showing the basic steps of ClinTrajan analysis is [available here](https://github.com/auranic/ClinTrajan/blob/master/tutorial/tutorial.md)
 
 ## Case studies
 

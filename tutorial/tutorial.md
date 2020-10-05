@@ -7,7 +7,7 @@ Application of ClinTrajan to a clinical dataset consists in two parts:
 1. [Quantification of the data](##quantification-of-the-data)
 2. [Application of ElPiGraph](##application-of-elpigraph-to-quantify-branching-pseudotime) and  [downstream analyses](###downstream-analyses-using-elpigraph)
 
-Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications]().  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way is to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutorial.ipynb). Alternatively, one can copy-paste and run the commands in any convinient Python environment. 
+Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications](https://leicester.figshare.com/articles/dataset/Myocardial_infarction_complications_Database/12045261/3).  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way is to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutorial.ipynb). Alternatively, one can copy-paste and run the commands in any convinient Python environment. 
 
 There exists also [complete Jupyter notebooks](), allowing one to reproduce all the analysis steps reported in the [ClinTrajan manuscript](https://arxiv.org/abs/2007.03788).
 

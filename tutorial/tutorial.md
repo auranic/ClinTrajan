@@ -52,7 +52,7 @@ with open('temp.txt','w') as fid:
 ```
 Note that we has written down just in case the quantification parameters such that we could use them after imputation of missing values and restoring the data table to the initial variable scales.
 
-Now we can impute the missing values. One of the simple idea is to compute SVD on the complete part of the data matrix and then project the data points with missing variables onto the principal components. The imputed value will be the value of the variable in the projection point.
+Now we can impute the missing values. One of simple ideas is to compute SVD on the complete part of the data matrix and then project the data points with missing variables onto the principal components. The imputed value will be the value of the variable in the projection point.
 ```
 dfq_imputed = SVDcomplete_imputation_method(dfq, variable_types, verbose=True,num_components=-1)
 dequant_info = invert_quant_info(load_quantification_info('temp.txt'))
@@ -80,7 +80,7 @@ Congrats, now we have the data matrix *X* to which we can apply the [ElPiGraph](
 
 ## Application of [ElPiGraph](https://sysbio-curie.github.io/elpigraph/) to quantify branching pseudotime
 
-Before applying ElPiGraph, let us first reduce the dimensionality of the dataset (more than 100!). [Some tests](https://github.com/j-bac/scikit-dimension) showed that the intrinsic dimensionality is much lower (around 12!), so let us apply Principal Component Analysis in order to reduce the dimension to this number. Note that we center all variables to zero mean and scale them to unit variance. Setting *svd_solver* to 'full' helps getting reproducible results (yes, by default, PCA is not reproducible!)
+Before applying ElPiGraph, let us first reduce the dimensionality of the dataset (more than 100!). [Some tests](https://github.com/j-bac/scikit-dimension) showed that the intrinsic dimensionality is much lower (around 12!), so let us apply Principal Component Analysis in order to reduce the dimension to this number. Note that we center all variables to zero mean and scale them to unit variance. Setting *svd_solver* to 'full' helps getting reproducible results (yes, by default, PCA is not reproducible in sckit-learn!)
 
 ```
 reduced_dimension = 12
@@ -91,7 +91,7 @@ v = pca.components_.T
 mean_val = np.mean(X,axis=0)
 X = Y[:,0:reduced_dimension]
 ```
-Now we construct the principal tree. You can specify only one parameter for the number of nodes in the tree, but here we explicitly show the value of the other parameters which are close to the default ones.
+Now we construct the [principal tree](https://www.mdpi.com/1099-4300/22/3/296). You can specify only one parameter for the number of nodes in the tree, but here we explicitly show the values of the other parameters which are close to the default ones.
 
 ```
 nnodes = 50
@@ -104,7 +104,7 @@ prune_the_tree(tree_elpi)
 # extend the leafs to reach the extreme data points
 tree_extended = ExtendLeaves_modified(X, tree_elpi, Mode = "QuantDists", ControlPar = .5, DoSA = False)
 ```
-This produces a simple plot with a projection of the principal tree on PCA plane. In 12D, the topology of the tree is more complex than it seams from 2D PCA projection!
+This produces a simple plot with a projection of the principal tree on PCA plane. In 12D, the topology of the tree is more complex then it seams from 2D PCA projection!
 
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree.png)
 
@@ -125,7 +125,7 @@ for i,p in enumerate(partition):
     partition_by_node[i] = p[0]
 ```
 
-In order to visualize the intrinsic geometry of the principal tree, and use it to project the data points from R<sup>N</sup> to R<sup>2</sup>, we can apply a version of force-directed layout to the principal tree (remember that a tree is a [planar graph](https://en.wikipedia.org/wiki/Planar_graph)!)
+In order to visualize the intrinsic geometry of the principal tree, and use it to project the data points from R<sup>N</sup> to R<sup>2</sup>, we can apply a version of [force-directed layout](https://en.wikipedia.org/wiki/Force-directed_graph_drawing) to the principal tree (remember that a tree is a [planar graph](https://en.wikipedia.org/wiki/Planar_graph)!)
 
 Let us visualize the tree with data points colored by the proximity to the tree segments:
 
@@ -139,7 +139,7 @@ plt.show()
 
 ### Downstream analyses using ElPiGraph
 
-Now let us visualize something more interesting, using the principal tree. We will visualize all lethal cases of myocardial infarction complications, and by the thickness of the tree edges, we will visualize the mortality trend along various clinical trajectories. Note that in our table the variable *LET_IS_0* means *'no lethal outcome'*!
+Now let us visualize something more interesting using the principal tree. We will visualize all lethal cases of myocardial infarction complications, and by the thickness of the tree edges, we will visualize the mortality trend along various clinical trajectories. Note that in our table the variable *LET_IS_0* means *'no lethal outcome'*!
 
 ```
 fig = plt.figure(figsize=(8, 8))
@@ -152,7 +152,7 @@ plt.show()
 ```
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree_lethality.png )
 
-Ok, some more insightfull visualizations. Not let us highlight all patients with age <65 years having bronchyal asthma in anamnesis:
+Ok, let us do some more insightfull visualizations. Not let us highlight all patients with age <65 years having bronchyal asthma in anamnesis:
 
 ```
 fig = plt.figure(figsize=(8, 8))

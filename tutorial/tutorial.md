@@ -53,9 +53,22 @@ This function produces the following output:
 
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/imputation_svd.png)
 
+Now, we are ready to quantify the data table. We will do it by applying optimal scaling to the ordinal values. 
 
+```
+df = remove_constant_columns_from_dataframe(df_imputed)
+variable_names = [str(s) for s in df.columns[1:]]
+X = df[df.columns[1:]].to_numpy()
+X_original = X
+X_before_scaling = X.copy()
+X,cik = optimal_scaling(X,variable_types,verbose=True,vmax=0.6)
+```
+The output looks like this:
 
-## Application of [ElPiGraph](https://sysbio-curie.github.io/elpigraph/)
+![](https://github.com/auranic/ClinTrajan/blob/master/images/optimal_scaling.png)
 
+which means that the sum of squared correlations (Q2 value) between all quantified ordinal variables and between ordinal and numerical variables increased, and in the final correlation table one can see more significant correlations.
 
+Congrats, now we have the data matrix *X* to which we can apply the [ElPiGraph](https://sysbio-curie.github.io/elpigraph/) algorithm!
 
+## Application of [ElPiGraph](https://sysbio-curie.github.io/elpigraph/) to quantify branching pseudotime

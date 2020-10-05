@@ -9,7 +9,7 @@ Application of ClinTrajan to a clinical dataset consists in two parts:
 
 Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications](https://leicester.figshare.com/articles/dataset/Myocardial_infarction_complications_Database/12045261/3).  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way is to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutorial.ipynb). Alternatively, one can copy-paste and run the commands in any convinient Python environment. 
 
-There exists also [complete Jupyter notebooks](../), allowing one to reproduce all the analysis steps reported in the [ClinTrajan manuscript](https://arxiv.org/abs/2007.03788).
+There exist also [complete Jupyter notebooks](https://github.com/auranic/ClinTrajan/), allowing one to reproduce all the analysis steps reported in the [ClinTrajan manuscript](https://arxiv.org/abs/2007.03788).
 
 
 ## Quantification of the data
@@ -22,10 +22,10 @@ import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt
 from clintraj_qi import *
+from clintraj_optiscale import *
 from clintraj_eltree import *
 from clintraj_util import *
 from clintraj_ml import *
-from clintraj_optiscale import *
 ```
 
 Now, let us import a dataset. It is assumed that the table is tab-delimited, contains only numbers or missing values in any row or column except for the first column (containing observation name) and the first row (containing variable names). Here it is assumed that certain column and rows of the table, containing too many missing values, have been eliminated. If the original dataset contains categorical nominal variables, they must be encoded first, using, for example, dummy encoding:
@@ -35,6 +35,8 @@ df = pd.read_csv('data/infarction/all_dummies.txt',delimiter='\t')
 display(df)
 quantify_nans(df)
 ```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/table_import.png)
 
 As one can see, only 34% of rows have complete values for all columns.
 

@@ -48,7 +48,7 @@ dfq,replacement_info = quantify_dataframe_univariate(df,variable_types)
 with open('temp.txt','w') as fid:
     fid.write(replacement_info)
 ```
-Note that we will write down just in case the quantification parameters such that we could use them after imputation of missing values and restoring the data table to the initial variable scales.
+Note that we has written down just in case the quantification parameters such that we could use them after imputation of missing values and restoring the data table to the initial variable scales.
 
 Now we can impute the missing values. One of the simple idea is to compute SVD on the complete part of the data matrix and then project the data points with missing variables onto the principal components. The imputed value will be the value of the variable in the projection point.
 ```
@@ -106,5 +106,32 @@ This produces a simple plot with a projection of the principal tree on PCA plane
 
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree.png)
 
-In particular, in the linear 2D projection, we can see more or less clearly only two branches of the tree.
+In particular, in the linear 2D projection, we can see more or less clearly only two branches of the principal tree.
+
+Before moving any further, we will need two partitionings of the data points, by proximity to the node of the graph in the multi-dimensional data space, and by the tree 'segment' (meaning a sequence of nodes in the tree without any branching point).
+
+```
+# paritioning the data by tree branches
+vec_labels_by_branches = partition_data_by_tree_branches(X,tree_extended)
+# paritioning the data by proximity to nodes
+partition, dists = elpigraph.src.core.PartitionData(X = X, NodePositions = tree_elpi['NodePositions'], 
+                                                    SquaredX = np.sum(X**2,axis=1,keepdims=1),
+                                                    MaxBlockSize = 100000000, TrimmingRadius = np.inf
+                                                    )
+partition_by_node = np.zeros(len(partition))
+for i,p in enumerate(partition):
+    partition_by_node[i] = p[0]
+```
+
+In order to visualize the intrinsic geometry of the principal tree, and use it to project the data points from R<sup>N</sup> to R<sup>2</sup>, we can apply a version of force-directed layout to the principal tree (remember that a tree is a [planar graph](https://en.wikipedia.org/wiki/Planar_graph)!)
+
+Let us visualize the tree with data points colored by the proximity to the tree segments:
+
+```
+fig = plt.figure(figsize=(8, 8))
+visualize_eltree_with_data(tree_extended,X,X_original,v,mean_val,'k',variable_names,
+                          Color_by_partitioning = True, visualize_partition = vec_labels_by_branches)
+plt.show()
+```
+![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree_segments.png)
 

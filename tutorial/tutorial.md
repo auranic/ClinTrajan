@@ -208,3 +208,57 @@ for var in vars:
                                                                     Continuous_Regression_Type='gpr',
                                                                     verbose=True)
 ```
+Here some of the detected associations are visualized. The actual data values are shown as red points, the probability given by logistic regression is shown as red line, and a simple sliding window smoothing of the data is shown as blue line.
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/variable_associations.png)
+
+Note that the scale (number of nodes) along each trajectory can be different. In general, the pseudotime quantified along different trajectories can not be directly compared because it can correspond to completely different physical time scale!
+
+The results of regression application for several variables can be shown simultaneously at the same plot:
+```
+pstt = PseudoTimeTraj[1]
+colors = ['r','b','g']
+for i,var in enumerate(vars):
+    vals = draw_pseudotime_dependence(pstt,var,variable_names,variable_types,X_original,colors[i],
+                                               linewidth=3,draw_datapoints=False)
+plt.legend()
+plt.show()
+```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/variable_associations_several.png)
+
+Finally, the pseudotime can be used to visualize pseudo-temporal profiles of any quantity that can be derived from the data. For example, we can compute the cumulative function of hazard in order to visualize the lethality risks along different clinical trajectories. We will do this, by using the survival analysis library 'lifelines'.
+
+```
+import lifelines
+from lifelines import SplineFitter
+from lifelines import NelsonAalenFitter
+from lifelines import KaplanMeierFitter
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w','tab:pink','tab:green']
+
+event_data = np.zeros((len(df),2))
+events = 1-np.array(df['LET_IS_0'])
+label = 'Death'
+
+for i,pstt in enumerate(PseudoTimeTraj):
+    points = pstt['Points']
+    times = pstt['Pseudotime']
+    for i,p in enumerate(points):
+        event_data[p,0] = times[i]
+        event_data[p,1] = events[p]
+
+plt.figure(figsize=(8,8))
+
+for i,pstt in enumerate(PseudoTimeTraj):
+    TrajName = 'Trajectory:'+str(pstt['Trajectory'][0])+'--'+str(pstt['Trajectory'][-1])
+    points = pstt['Points']
+    naf = NelsonAalenFitter()
+    T = event_data[points,0]
+    E = event_data[points,1]
+    naf.fit(event_data[points,0], event_observed=event_data[points,1],label=TrajName)  
+    naf.plot_hazard(bandwidth=3.0,fontsize=20,linewidth=10,color=colors[i])
+```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/hazard_pseudotime.png)
+
+We can see that six out of nine trajectories are associated with significantly increasing lethality risk.

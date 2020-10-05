@@ -51,7 +51,8 @@ For the moment the only way to use the package is to copy the .py files from the
 
 ## Tutorial
 
-A simplified tutorial showing the basic steps of ClinTrajan analysis is [available here](https://github.com/auranic/ClinTrajan/blob/master/tutorial/tutorial.md)
+A simplified tutorial showing the basic steps of ClinTrajan analysis is [available here](https://github.com/auranic/ClinTrajan/blob/master/tutorial/tutorial.md).
+This tutorial is just better explained presentation of [this Jupyter notebook](ClinTrajan_tutorial.ipynb).
 
 ## Case studies
 

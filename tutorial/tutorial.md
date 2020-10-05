@@ -135,3 +135,76 @@ plt.show()
 ```
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree_segments.png)
 
+Now let us visualize something more interesting, using the principal tree. We will visualize all lethal cases of myocardial infarction complications, and by the thickness of the tree edges, we will visualize the mortality trend along various clinical trajectories. Note that in our table the variable *LET_IS_0* means *'no lethal outcome'*!
+
+```
+fig = plt.figure(figsize=(8, 8))
+non_lethal_feature = 'LET_IS_0'
+visualize_eltree_with_data(tree_extended,X,X_original,v,mean_val,'k',variable_names,
+                          Color_by_feature=non_lethal_feature, Feature_Edge_Width=non_lethal_feature,
+                           Invert_Edge_Value=True,Min_Edge_Width=10,Max_Edge_Width=50,
+                           Visualize_Edge_Width_AsNodeCoordinates=True,cmap='winter')
+plt.show()
+```
+![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree_lethality.png )
+
+Ok, some more insightfull visualizations. Not let us highlight all patients with age <65 years having bronchyal asthma in anamnesis:
+
+```
+fig = plt.figure(figsize=(8, 8))
+inds = np.where((X_original[:,variable_names.index('AGE')]<=65)&(X_original[:,variable_names.index('zab_leg_03')]==1))[0]
+colors = ['k' for i in range(len(X))]
+for i in inds:
+    colors[i] = 'r'
+visualize_eltree_with_data(tree_extended,X,X_original,v,mean_val,colors,variable_names,
+                          highlight_subset=inds,Big_Point_Size=100,cmap='hot')
+plt.show()
+```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree_asthma.png)
+
+Further we want to quantify the pseudotime, but for this we need to define the root node. Here it should be the node corresponding to the least complicated case of myocardial infarction. Let us make yet another visualization in order to find it. For this we will visualize, using pie-charts, the proportion of complications in each node of the tree. The pie-chart will show the fraction of uncomplicated cases by black, and the fraction of complications by red. The size of the chart corresponds to the number of data points it represents (for which this is the closest node of the graph). Note that the lethal outcome is considered as - serious! - complication.
+
+```
+fig = plt.figure(figsize=(12, 12))
+ax = fig.add_subplot(1,1,1)
+complication_vars = ['FIBR_PREDS','PREDS_TAH','JELUD_TAH','FIBR_JELUD',
+                     'A_V_BLOK','OTEK_LANC','RAZRIV','DRESSLER',
+                     'ZSN','REC_IM','P_IM_STEN']
+inds_compl = [variable_names.index(a) for a in complication_vars]
+lethal = 1-X_original[:,variable_names.index('LET_IS_0')]
+has_complication = np.sum(X_original[:,inds_compl],axis=1)>0
+inds = np.where((has_complication==0)&(lethal==0))[0]
+colors = ['r' for i in range(len(X))]
+for i in inds:
+    colors[i] = 'k'
+visualize_eltree_with_data(tree_extended,X,X_original,v,mean_val,colors,variable_names,
+                          highlight_subset=inds,Big_Point_Size=2,Normal_Point_Size=2,showNodeNumbers=True)
+add_pie_charts(ax,tree_extended['NodePositions2D'],colors,['r','k'],partition,scale=30)
+plt.show()
+root_node = 8
+print('Root node=',root_node)
+```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree_complications.png)
+
+As a result, we have just identified the node number 8 as the potential root because the proportion of complications in it was the least. Now we know from where to start the clinical trajectories and quantify pseudotime:
+
+```
+all_trajectories,all_trajectories_edges = extract_trajectories(tree_extended,root_node)
+print(len(all_trajectories),' trajectories found.')
+ProjStruct = project_on_tree(X,tree_extended)
+PseudoTimeTraj = quantify_pseudotime(all_trajectories,all_trajectories_edges,ProjStruct)
+```
+
+Nine clinical trajectories have been finally identified. As in clustering, it is up to us to give some meaning for them though. One of the ways to do it, is to test if a set of clinical variables can be associated to some trajectories via non-linear regression which - in the case of binary variables - can be the logistic regression:
+
+```
+vars = ['ritm_ecg_p_01','ritm_ecg_p_02','ritm_ecg_p_04']
+for var in vars:
+    List_of_Associations = regression_of_variable_with_trajectories(PseudoTimeTraj,var,variable_names,
+                                                                    variable_types,X_original,R2_Threshold=0.5,
+                                                                    producePlot=True,
+                                                                    Continuous_Regression_Type='gpr',
+                                                                    verbose=True)
+```

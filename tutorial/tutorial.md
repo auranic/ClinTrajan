@@ -7,7 +7,7 @@ Application of ClinTrajan to a clinical dataset consists in two parts:
 1. [Quantification of the data](##quantification-of-the-data)
 2. [Application of ElPiGraph](##application-of-elpigraph-to-quantify-branching-pseudotime) and  [downstream analyses](###downstream-analyses-using-elpigraph)
 
-Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications](https://leicester.figshare.com/articles/dataset/Myocardial_infarction_complications_Database/12045261/3).  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way is to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutorial.ipynb). Alternatively, one can copy-paste and run the commands in any convinient Python environment. 
+Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications](https://leicester.figshare.com/articles/dataset/Myocardial_infarction_complications_Database/12045261/3).  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutorial.ipynb). Alternatively, one can copy-paste and run the commands in any convenient Python environment. 
 
 There exist also [complete Jupyter notebooks](https://github.com/auranic/ClinTrajan/), allowing one to reproduce all the analysis steps reported in the [ClinTrajan manuscript](https://arxiv.org/abs/2007.03788).
 
@@ -50,7 +50,7 @@ dfq,replacement_info = quantify_dataframe_univariate(df,variable_types)
 with open('temp.txt','w') as fid:
     fid.write(replacement_info)
 ```
-Note that we has written down just in case the quantification parameters such that we could use them after imputation of missing values and restoring the data table to the initial variable scales.
+Note that we have written down just in case the quantification parameters such that we could use them after imputation of missing values and restore the data table to the initial variable scales.
 
 Now we can impute the missing values. One of simple ideas is to compute SVD on the complete part of the data matrix and then project the data points with missing variables onto the principal components. The imputed value will be the value of the variable in the projection point.
 ```
@@ -104,7 +104,7 @@ prune_the_tree(tree_elpi)
 # extend the leafs to reach the extreme data points
 tree_extended = ExtendLeaves_modified(X, tree_elpi, Mode = "QuantDists", ControlPar = .5, DoSA = False)
 ```
-This produces a simple plot with a projection of the principal tree on PCA plane. In 12D, the topology of the tree is more complex then it seams from 2D PCA projection!
+This produces a simple plot with a projection of the principal tree on PCA plane. In 12D, the topology of the tree is more complex then it seems from 2D PCA projection!
 
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/principal_tree.png)
 

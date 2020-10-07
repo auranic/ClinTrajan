@@ -102,3 +102,5 @@ In order to use them, download the content of the git and start the notebook fro
 ## References:
 
 (1) [Albergante L, Mirkes E, Bac J, Chen H, Martin A, Faure L, Barillot E, Pinello L, Gorban A, Zinovyev A. Robust and scalable learning of complex intrinsic dataset geometry via ElPiGraph. 2020. Entropy 22(3):296](https://www.mdpi.com/1099-4300/22/3/296)
+
+(2) [Golovenkin SE, Bac J, Chervov A, Mirkes EM, Orlova YV, Barillot E, Gorban AN, Zinovyev A. Trajectories, bifurcations and pseudotime in large clinical datasets: applications to myocardial infarction and diabetes data. 2020. arXiv:2007.03788](https://arxiv.org/abs/2007.03788)

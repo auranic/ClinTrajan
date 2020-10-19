@@ -1,3 +1,29 @@
+# ClinTrajan Python package
+# 
+# Copyright (C) 2020,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
+# Copyright (C) 2020,  University of Leicester, University Rd, Leicester LE1 7RH, UK
+# Copyright (C) 2020,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
+# 
+# ClinTrajan is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# ClinTrajan is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# See the GNU  Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public  
+# License along with this library; if not, write to the Free Software  
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# 
+# ClinTrajan authors:
+# Andrei Zinovyev: http://andreizinovyev.site
+# Eugene Mirkes: https://github.com/mirkes
+# Jonathan Bac: https://github.com/j-bac
+# Alexander Chervov: https://github.com/chervov
+
 import networkx as nx
 import igraph
 import scipy.stats
@@ -9,6 +35,8 @@ from gbrancher import branch_labler
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import pandas as pd
+import math
 
 from clintraj_util import moving_weighted_average
 from clintraj_util import fill_gaps_in_number_sequence
@@ -50,7 +78,27 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
                               add_color_bar=False,
                               vmin=-1,vmax=-1,
                               percentile_contraction=20):
-
+    """
+       Function used to create a 2D visualization of the principal tree
+       together with the data.
+       Parameters
+       ----------
+       tree_elpi : ElPiGraph object
+              the principal tree		
+       X : ndarray
+              the pre-processed data matrix which was used to construct the tree
+              usually, it is a projection in the first principal components
+       X_original : ndarray
+              the initial data matrix containing all variables unpreprocessed
+              the principal tree		
+       principal_component_vectors : ndarray
+              vectors of principal components
+       mean_vector : ndarray
+       color : ndarray 
+              array of color values to be used in the scatter plotting
+       variable_names : list of strings
+              names of the variables in the same order as in X_original
+    """
     nodep = tree_elpi['NodePositions']
     nodep_original = np.matmul(nodep,principal_component_vectors[:,0:X.shape[1]].T)+mean_vector
     adjmat = tree_elpi['ElasticMatrix']
@@ -262,6 +310,9 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
     #plt.axis('off')
 
 def convert_elpigraph_to_igraph(elpigraph):
+    """
+     Function converting ElPiGraph object into igraph object    
+    """
     edges = elpigraph['Edges'][0]
     nodes_positions = elpigraph['NodePositions']
     g = igraph.Graph()
@@ -271,6 +322,10 @@ def convert_elpigraph_to_igraph(elpigraph):
 
 
 def partition_data_by_tree_branches(X,tree_elpi):
+    """
+     Partitioning of data points from X accordingly to the segments 
+     (tree branches) of the principal tree
+    """
     edges = tree_elpi['Edges'][0]
     nodes_positions = tree_elpi['NodePositions']
     g = igraph.Graph()
@@ -281,7 +336,9 @@ def partition_data_by_tree_branches(X,tree_elpi):
 
 
 def prune_the_tree(tree_elpi):
-    # remove short 'orphan' edges not forming a continuous branch
+    """
+     remove short 'orphan' edges not forming a continuous branch
+    """
     old_tree = tree_elpi.copy()
     edges = tree_elpi['Edges'][0]
     nodes_positions = tree_elpi['NodePositions']
@@ -316,6 +373,9 @@ def prune_the_tree(tree_elpi):
     tree_elpi['NodePositions'] = nodes_positions[vs_subset,:]
 
 def random_sign():
+    """
+     Gives -1 or 1 randomly
+    """
     return 1 if random.random() < 0.5 else -1
 
 def ExtendLeaves_modified(X, PG,
@@ -567,6 +627,9 @@ def ExtendLeaves_modified(X, PG,
     return(TargetPG)
 
 def pseudo_time(root_node,point_index,traj,projval,edgeid,edges):
+    """
+      Quantification of pseudotime value for a single data point point_index
+    """
     xi = int(point_index)
     proj_val_x = projval[xi]
     #print(proj_val_x)
@@ -594,6 +657,10 @@ def pseudo_time(root_node,point_index,traj,projval,edgeid,edges):
     return pstime
 
 def pseudo_time_trajectory(traj_vertices,traj_edges,ProjStruct):
+    """
+      Auxillary function for quantify_pseudotime() function, should not be used
+      directly
+    """
     projval = ProjStruct['ProjectionValues']
     edgeid = (ProjStruct['EdgeID']).astype(int)
     edges = ProjStruct['Edges']
@@ -608,6 +675,17 @@ def pseudo_time_trajectory(traj_vertices,traj_edges,ProjStruct):
     return pst,traj_points
 
 def extract_trajectories(tree,root_node,verbose=False):
+    """
+	Extracting trajectories from ElPiGraph result object tree,
+        starting from a root_node.
+        Extracting trajectories is a required step for quantifying pseudotime 
+        after.
+        Example:
+            all_trajectories,all_trajectories_edges = extract_trajectories(tree,root_node)
+            print(len(all_trajectories),' trajectories found.')
+            ProjStruct = project_on_tree(X,tree)
+            PseudoTimeTraj = quantify_pseudotime(all_trajectories,all_trajectories_edges,ProjStruct)
+    """
     edges = tree['Edges'][0]
     nodes_positions = tree['NodePositions']
     g = igraph.Graph()
@@ -636,6 +714,10 @@ def extract_trajectories(tree,root_node,verbose=False):
     return all_trajectories_vertices, all_trajectories_edges
 
 def correlation_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,X_original,verbose=False,producePlot=False,Correlation_Threshold=0.5):
+    """
+      Computes a correlation of a variable with pseudotime along all trajectories
+      stored in PseudoTimeTraj structure
+    """
     List_of_Associations = []
     for i,pstt in enumerate(PseudoTimeTraj):
         inds = pstt['Trajectory']
@@ -667,7 +749,12 @@ def correlation_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,X_ori
 
 
 def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,producePlot=True,verbose=False,Continuous_Regression_Type='linear',R2_Threshold=0.5,max_sample=-1,alpha_factor=2):
-    # Continuous_Regression_Type can be 'linear','gpr' for Gaussian Process, 'kr' for kernel ridge
+    """
+      Auxillary function for regression_of_variable_with_trajectories()
+
+      Continuous_Regression_Type can be 'linear','gpr' for Gaussian Process, 'kr' for kernel ridge
+
+    """
     if var_type=='BINARY':
         #convert back to binary vals
         mn = min(vals)
@@ -733,6 +820,13 @@ def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,pr
     return r2score, regressor
 
 def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variable_types,X_original,verbose=False,producePlot=True,R2_Threshold=0.5,Continuous_Regression_Type='linear',max_sample=1000,alpha_factor=2):
+    """
+      Regression analysis of a single variable against all trajectories
+      stored in PseudoTimeTraj
+
+      Continuous_Regression_Type can be 'linear','gpr' for Gaussian Process, 'kr' for kernel ridge
+
+    """
     List_of_Associations = []
     for i,pstt in enumerate(PseudoTimeTraj):
         inds = pstt['Trajectory']
@@ -756,6 +850,16 @@ def regression_of_variable_with_trajectories(PseudoTimeTraj,var,var_names,variab
 
 
 def quantify_pseudotime(all_trajectories_vertices,all_trajectories_edges,ProjStruct,producePlot=False):
+    """
+      Main function for quantifying pseudotime
+
+        Example of use:
+            all_trajectories,all_trajectories_edges = extract_trajectories(tree,root_node)
+            print(len(all_trajectories),' trajectories found.')
+            ProjStruct = project_on_tree(X,tree)
+            PseudoTimeTraj = quantify_pseudotime(all_trajectories,all_trajectories_edges,ProjStruct)
+
+    """
     projval = ProjStruct['ProjectionValues']
     edgeid = (ProjStruct['EdgeID']).astype(int)
     edges = ProjStruct['Edges']
@@ -774,6 +878,11 @@ def quantify_pseudotime(all_trajectories_vertices,all_trajectories_edges,ProjStr
     return PseudoTimeTraj
 
 def project_on_tree(X,tree):
+    """
+       Project a dataset X on ElPiGraph result structure tree.
+
+       Returns ProjStruct structure
+    """
     nodep = tree['NodePositions']
     edges = tree['Edges'][0]
     partition, dists = elpigraph.src.core.PartitionData(X = X, NodePositions = nodep, MaxBlockSize = 100000000, TrimmingRadius = np.inf,SquaredX = np.sum(X**2,axis=1,keepdims=1))
@@ -787,6 +896,10 @@ def project_on_tree(X,tree):
     return ProjStruct
 
 def draw_pseudotime_dependence(trajectory,variable_name,variable_names,variable_types,X_original,color_line,linewidth=1,fontsize=20,draw_datapoints=False,label=None,linestyle=None):
+    """
+       Drawing function showing dependence of a variable on pseudotime along
+       a particular trajectory
+    """
     regressor = trajectory[variable_name+'_regressor']
     k = variable_names.index(variable_name)
     mn = min(X_original[:,k])
@@ -813,6 +926,9 @@ def draw_pseudotime_dependence(trajectory,variable_name,variable_names,variable_
     return vals
 
 def add_pie_charts_tree(ax,tree,values,color_seq,scale=1):
+    """
+       Drawing function used to draw pie-charts on top of a principal tree layout
+    """
     nodep = tree['NodePositions']
     edges = tree['Edges'][0]
     g=nx.Graph()
@@ -821,7 +937,10 @@ def add_pie_charts_tree(ax,tree,values,color_seq,scale=1):
     idx=np.array([pos[j] for j in range(len(pos))])
     add_pie_charts(ax,idx,values,color_seq,scale=scale)
 
-def add_pie_charts(ax,node_positions2d,values,color_seq,scale=1):
+def add_pie_charts(ax,node_positions2d,values,color_seq,partition,scale=1):
+    """
+       Auxillary function for add_pie_charts_tree()
+    """
     df = pd.DataFrame({'CLASS':values})
     vals_unique_df = df.CLASS.value_counts()
     vals_unique = vals_unique_df.index.to_list()
@@ -843,6 +962,9 @@ def add_pie_charts(ax,node_positions2d,values,color_seq,scale=1):
         draw_pie(ax,freq,color_seq,X=node_positions2d[i,0],Y=node_positions2d[i,1],size=scale*len(inode[0]))
 
 def draw_pie(ax,ratios,colors,X=0, Y=0, size = 1000):
+    """
+       Auxillary function for add_pie_charts_tree()
+    """
     N = len(ratios)
     xy = []
     start = 0.

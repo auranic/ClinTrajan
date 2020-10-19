@@ -1,3 +1,30 @@
+# ClinTrajan Python package
+# 
+# Copyright (C) 2020,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
+# Copyright (C) 2020,  University of Leicester, University Rd, Leicester LE1 7RH, UK
+# Copyright (C) 2020,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
+# 
+# ClinTrajan is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# ClinTrajan is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# See the GNU  Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public  
+# License along with this library; if not, write to the Free Software  
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# 
+# ClinTrajan authors:
+# Andrei Zinovyev: http://andreizinovyev.site
+# Eugene Mirkes: https://github.com/mirkes
+# Jonathan Bac: https://github.com/j-bac
+# Alexander Chervov: https://github.com/chervov
+
+
 import pandas as pd
 import numpy as np
 from scipy.stats import norm
@@ -134,17 +161,20 @@ def invert_quant_info(quant_info):
 def quantify_nans(df,file_to_write=''):
     # quantifying the nans
     var_missing_val = df.isnull().sum()
-    var_missing_val.to_csv('var_missing_val.txt', index=True,sep='\t')
+    if not file_to_write=='':
+        var_missing_val.to_csv('var_missing_val.txt', index=True,sep='\t')
 
     var_missing_sample = df.transpose().isnull().sum()
-    var_missing_sample.to_csv('var_missing_sample.txt', index=True,sep='\t')
+    if not file_to_write=='':
+        var_missing_sample.to_csv('var_missing_sample.txt', index=True,sep='\t')
 
     print('Missing values {} ({}%)'.format(df.isnull().sum().sum(),100*df.isnull().sum().sum()/(df.shape[1]-1)/(df.shape[0])))
 
     # extract the complete part of the dataset
 
+    dfc = df.dropna()
+
     if not file_to_write=='':
-        dfc = df.dropna()
         dfc.to_csv(file_to_write,index=False,sep='\t')
 
     print('Number of complete rows: {} ({}%)'.format(dfc.shape[0],100*dfc.shape[0]/df.shape[0]))

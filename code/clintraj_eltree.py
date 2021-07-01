@@ -764,12 +764,12 @@ def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,pr
         if len(np.unique(vals))==1:
             regressor = None
         else:
-            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none').fit(pseudotime, vals)
+            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none',solver='lbfgs').fit(pseudotime, vals)
     if var_type=='CATEGORICAL':
         if len(np.unique(vals))==1:
             regressor = None
         else:
-            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none').fit(pseudotime, vals)
+            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none',solver='lbfgs').fit(pseudotime, vals)
     if var_type=='CONTINUOUS' or var_type=='ORDINAL':
         if len(np.unique(vals))==1:
             regressor = None

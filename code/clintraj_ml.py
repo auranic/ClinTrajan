@@ -25,11 +25,13 @@
 # Alexander Chervov: https://github.com/chervov
 
 
-import trimap
 import getpass
 import os
 from os import path
 
+import trimap
+import pymde
+import umap
 
 import random
 import numpy as np
@@ -44,9 +46,13 @@ from sklearn.decomposition import PCA
 
 from umap import UMAP
 
-from keras.layers import Input, Dense, Lambda
-from keras.models import Model
-from keras import backend as K
+import tensorflow as tf
+
+from tensorflow import keras
+
+from tensorflow.keras.layers import Input, Dense, Lambda
+from tensorflow.keras.models import Model
+from tensorflow.keras import backend as K
 
 def apply_panel_of_manifold_learning_methods(X,color,
                                 Color_by_branches=[],precomputed_results={},
@@ -132,7 +138,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
         t0 = time()
         if  not onlyDraw or not 'LLE' in precomputed_results:
             print('Computing LLE...')
-            Y_LLE = manifold.LocallyLinearEmbedding(n_neighbors, n_components,
+            Y_LLE = manifold.LocallyLinearEmbedding(n_neighbors=n_neighbors, n_components=n_components,
                                     eigen_solver='auto',
                                     method='standard').fit_transform(X)
             viz_results['LLE'] = Y_LLE
@@ -153,7 +159,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
     if applyAllMethods or 'MLLE' in methods_to_apply:
         t0 = time()
         if  not onlyDraw  or not 'MLLE' in precomputed_results:
-            Y_MLLE = manifold.LocallyLinearEmbedding(n_neighbors, n_components,
+            Y_MLLE = manifold.LocallyLinearEmbedding(n_neighbors=n_neighbors, n_components=n_components,
                                         eigen_solver='auto',
                                         method='modified').fit_transform(X)
             viz_results['MLLE'] = Y_MLLE
@@ -175,7 +181,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
         i += 1
         t0 = time()
         if  not onlyDraw or not 'ISOMAP' in precomputed_results:
-            Y_ISOMAP = manifold.Isomap(n_neighbors, n_components).fit_transform(X)
+            Y_ISOMAP = manifold.Isomap(n_neighbors=n_neighbors, n_components=n_components).fit_transform(X)
             viz_results['ISOMAP'] = Y_ISOMAP
         else:
             Y_ISOMAP = viz_results['ISOMAP']
@@ -207,7 +213,8 @@ def apply_panel_of_manifold_learning_methods(X,color,
         ax.xaxis.set_major_formatter(NullFormatter())
         ax.yaxis.set_major_formatter(NullFormatter())
         plt.axis('tight')
-
+        
+        
     ### SpectralEmbedding ###
     if applyAllMethods or 'SE' in methods_to_apply:      
         i += 1
@@ -226,6 +233,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
         ax.xaxis.set_major_formatter(NullFormatter())
         ax.yaxis.set_major_formatter(NullFormatter())
         plt.axis('tight')
+
 
 
     ### t-SNE ###
@@ -248,6 +256,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
         plt.axis('tight')
 
 
+        
     ### UMAP ###
     if applyAllMethods or 'UMAP' in methods_to_apply:          
         i += 1
@@ -267,7 +276,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
         ax.xaxis.set_major_formatter(NullFormatter())
         ax.yaxis.set_major_formatter(NullFormatter())
         plt.axis('tight')
-
+        
     ### TRIMAP ###
     if applyAllMethods or 'TRIMAP' in methods_to_apply:              
         t0 = time()
@@ -286,26 +295,29 @@ def apply_panel_of_manifold_learning_methods(X,color,
         ax.yaxis.set_major_formatter(NullFormatter())
         plt.axis('tight')
 
-
-    ### ELMAP ###
-    #if  not onlyDraw:
-    if applyAllMethods or 'ELMAP' in methods_to_apply:                  
-        if os.path.exists(ElMapFolder+'/tests/_elmap_proj.txt'):
-            Xproj_pd = pd.read_csv(ElMapFolder+'/tests/_elmap_proj.txt', sep='\t',header=None)
-            Xproj = Xproj_pd.to_numpy()[:,0:-1]
-            Y_ELMAP = Xproj
-            i += 1
-            ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
-            plt.scatter(Y_ELMAP[:, 0], Y_ELMAP[:, 1], c=color1, cmap=cmap,s=points_size)
-            plt.title("ELMAP",fontdict = {'fontsize' : title_fontsize})
-            ax.xaxis.set_major_formatter(NullFormatter())
-            ax.yaxis.set_major_formatter(NullFormatter())
-            plt.axis('tight')
-
+        
+    ### MDE ###
+    if applyAllMethods or 'MDE' in methods_to_apply:              
+        t0 = time()
+        if  not onlyDraw  or not 'MDE' in precomputed_results:
+            Y_MDE = pymde.preserve_neighbors(X, embedding_dim=2, verbose=False).embed()        
+            viz_results['MDE'] = Y_MDE
+        else:
+            Y_MDE = viz_results['MDE']
+        t1 = time()
+        print("MDE: %.2g sec" % (t1 - t0))
+        i += 1
+        ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
+        plt.scatter(Y_MDE[:, 0], Y_MDE[:, 1], c=color1, cmap=cmap,s=points_size)
+        plt.title("MDE",fontdict = {'fontsize' : title_fontsize})
+        ax.xaxis.set_major_formatter(NullFormatter())
+        ax.yaxis.set_major_formatter(NullFormatter())
+        plt.axis('tight')
+                
 
     ### Autoencoder ###
     if applyAllMethods or 'AUTOENCODER' in methods_to_apply:        
-        layer_sizes = [64,32,16,8]
+        layer_sizes = [64,32,16,8,4]
         #encoder
         inputs = Input(shape=(X.shape[1],), name='encoder_input')
         x = inputs
@@ -334,7 +346,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
         t0 = time()
         if  not onlyDraw  or not 'AUTOENCODER' in precomputed_results:
             autoencoder.fit(x=X_01,y=X_01,epochs=200,verbose=0)
-            Y_AUTOENCODER = encoder.predict(X)
+            Y_AUTOENCODER = encoder.predict(X_01)
             viz_results['AUTOENCODER'] = Y_AUTOENCODER
         else:
             Y_AUTOENCODER = viz_results['AUTOENCODER']
@@ -347,8 +359,7 @@ def apply_panel_of_manifold_learning_methods(X,color,
         plt.title("Autoencoder",fontdict = {'fontsize' : title_fontsize})
         ax.xaxis.set_major_formatter(NullFormatter())
         ax.yaxis.set_major_formatter(NullFormatter())
-        plt.axis('tight')
-
+        plt.axis('tight')        
 
     ### VAE ###
     if applyAllMethods or 'VAE' in methods_to_apply:        
@@ -384,14 +395,20 @@ def apply_panel_of_manifold_learning_methods(X,color,
         def vae_loss(x, x_decoded_mean):
             xent_loss = K.mean(K.square((x- x_decoded_mean)))
             kl_loss = - 0.5 * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
-            return xent_loss + kl_loss
+            #print(type(xent_loss))
+            #print(type(kl_loss))
+            #return K.sum(xent_loss,kl_loss)
+            #return tf.convert_to_tensor(kl_loss)
+            return xent_loss+kl_loss
         vae.compile(optimizer='adam', loss=vae_loss)
 
         X_01 = (X-X.min())/(X.max()-X.min())
+        #print(X_01)
+        #X_01 = X.copy()
         t0 = time()
         if  not onlyDraw  or not 'VAE' in precomputed_results:
             vae.fit(x=X_01,y=X_01,epochs=200,verbose=0)
-            Y_VAE = encoder.predict(X)[0]
+            Y_VAE = encoder.predict(X_01)[0]
             viz_results['VAE'] = Y_VAE
         else:
             Y_VAE = viz_results['VAE']

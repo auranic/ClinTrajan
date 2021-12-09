@@ -62,7 +62,7 @@ from scipy.stats import spearmanr
 import seaborn as sns 
 
 
-def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vectors,mean_vector,color,variable_names,
+def visualize_eltree_with_data(tree_elpi,X,X_original,color,variable_names,principal_component_vectors=None,mean_vector=None,
                               showEdgeNumbers=False,showNodeNumbers=False,showBranchNumbers=False,showPointNumbers=False,
                               Color_by_feature = '', Feature_Edge_Width = '', Invert_Edge_Value = False,
                               Min_Edge_Width = 5, Max_Edge_Width = 5, 
@@ -76,31 +76,12 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
                               Visualize_Branch_Class_Associations = [], #list_of_branch_class_associations
                               cmap = 'cool',scatter_parameter=0.03,highlight_subset=[],
                               add_color_bar=False,
-                              vmin=-1,vmax=-1,
+                              vmin=None,vmax=None,
                               percentile_contraction=20):
-    """
-       Function used to create a 2D visualization of the principal tree
-       together with the data.
-       Parameters
-       ----------
-       tree_elpi : ElPiGraph object
-              the principal tree		
-       X : ndarray
-              the pre-processed data matrix which was used to construct the tree
-              usually, it is a projection in the first principal components
-       X_original : ndarray
-              the initial data matrix containing all variables unpreprocessed
-              the principal tree		
-       principal_component_vectors : ndarray
-              vectors of principal components
-       mean_vector : ndarray
-       color : ndarray 
-              array of color values to be used in the scatter plotting
-       variable_names : list of strings
-              names of the variables in the same order as in X_original
-    """
+
     nodep = tree_elpi['NodePositions']
-    nodep_original = np.matmul(nodep,principal_component_vectors[:,0:X.shape[1]].T)+mean_vector
+    if not principal_component_vectors is None:
+      nodep_original = np.matmul(nodep,principal_component_vectors[:,0:X.shape[1]].T)+mean_vector
     adjmat = tree_elpi['ElasticMatrix']
     edges = tree_elpi['Edges'][0]
     color2 = color
@@ -128,6 +109,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
             newc.append(col)
         color2 = newc
     
+
     plt.style.use('ggplot')
     points_size = Normal_Point_Size*np.ones(X_original.shape[0])
     if len(Visualize_Branch_Class_Associations)>0:
@@ -233,11 +215,12 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
         rsgn = random_sign()
         x[i] = x_coo+vey*r*rsgn
         y[i] = y_coo-vex*r*rsgn
-    if vmin<0:
-        vmin=min(color2)
-    if vmax<0:
-        vmax=max(color2)
+    #if vmin<0:
+    #    vmin=min(color2)
+    #if vmax<0:
+    #    vmax=max(color2)
     plt.scatter(x,y,c=color2,cmap=cmap,s=points_size, vmin=vmin, vmax=vmax,alpha=Transparency_Alpha_points)
+    #plt.scatter(x,y,c=color2,cmap=cmap,s=points_size, alpha=Transparency_Alpha_points)
     if showPointNumbers:
         for j in range(len(X)):
             plt.text(x[j],y[j],j)
@@ -308,6 +291,10 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,principal_component_vector
             plt.text(idx[i,0],idx[i,1],str(i),FontSize=20,bbox=dict(facecolor='grey', alpha=0.5))
 
     #plt.axis('off')
+    coords = np.zeros((len(x),2))
+    coords[:,0] = x
+    coords[:,1] = y
+    return coords
 
 def convert_elpigraph_to_igraph(elpigraph):
     """

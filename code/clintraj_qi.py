@@ -239,7 +239,7 @@ def SVDcomplete_imputation_method(dfq,variable_types,num_components=-1,produce_p
     # making pca on the complete matrix
 
     if num_components<0:
-        pca = PCA(n_components=X.shape[1])
+        pca = PCA(n_components=X.shape[1],svd_solver='full')
         u = pca.fit_transform(X)
         v = pca.components_.T
         s = pca.explained_variance_ratio_
@@ -249,7 +249,7 @@ def SVDcomplete_imputation_method(dfq,variable_types,num_components=-1,produce_p
             print('Effective linear dimension',lin_dim)
         num_components = lin_dim
         
-    pca = PCA(n_components=num_components)
+    pca = PCA(n_components=num_components,svd_solver='full')
     u = pca.fit_transform(X)
     v = pca.components_.T
     s = pca.explained_variance_ratio_
@@ -315,7 +315,7 @@ def SVDcomplete_imputation_method(dfq,variable_types,num_components=-1,produce_p
     #print('v',v)
 
     # Performing pca on the injected manifold, just in case for check
-    pca1 = PCA(n_components=num_components)
+    pca1 = PCA(n_components=num_components,svd_solver='full')
     u1 = pca1.fit_transform(Xmvc_proj)
     v1 = pca1.components_.T
     s1 = pca1.explained_variance_ratio_
@@ -354,7 +354,7 @@ def SVDcomplete_imputation_method(dfq,variable_types,num_components=-1,produce_p
     # Performing pca on the imputed dataset, just in case for check
 
     X = dfq_imputed[dfq_imputed.columns[1:]].to_numpy()
-    pca2 = PCA(n_components=num_components)
+    pca2 = PCA(n_components=num_components,svd_solver='full')
     u2 = pca2.fit_transform(X)
     v2 = pca2.components_.T
     s2 = pca2.explained_variance_ratio_

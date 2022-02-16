@@ -276,7 +276,7 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,color,variable_names,princ
         y_coo = np.concatenate((idx[edges[j,0],[1]],idx[edges[j,1],[1]]))
         plt.plot(x_coo,y_coo,c='k',linewidth=Min_Edge_Width+(Max_Edge_Width-Min_Edge_Width)*edge_vals[j],alpha=Transparency_Alpha)
         if showEdgeNumbers:
-            plt.text((x_coo[0]+x_coo[1])/2,(y_coo[0]+y_coo[1])/2,j,FontSize=20,bbox=dict(facecolor='grey', alpha=0.5))
+            plt.text((x_coo[0]+x_coo[1])/2,(y_coo[0]+y_coo[1])/2,j,fontsize=20,bbox=dict(facecolor='grey', alpha=0.5))
 
     if showBranchNumbers:
         branch_vals = list(set(visualize_partition))
@@ -284,11 +284,11 @@ def visualize_eltree_with_data(tree_elpi,X,X_original,color,variable_names,princ
             ind = visualize_partition==val
             xbm = np.mean(x[ind])
             ybm = np.mean(y[ind])
-            plt.text(xbm,ybm,int(val),FontSize=20,bbox=dict(facecolor='grey', alpha=0.5))
+            plt.text(xbm,ybm,int(val),fontsize=20,bbox=dict(facecolor='grey', alpha=0.5))
         
     if showNodeNumbers:
         for i in range(nodep.shape[0]):
-            plt.text(idx[i,0],idx[i,1],str(i),FontSize=20,bbox=dict(facecolor='grey', alpha=0.5))
+            plt.text(idx[i,0],idx[i,1],str(i),fontsize=20,bbox=dict(facecolor='grey', alpha=0.5))
 
     #plt.axis('off')
     coords = np.zeros((len(x),2))

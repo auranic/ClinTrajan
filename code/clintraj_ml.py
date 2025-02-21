@@ -1,8 +1,8 @@
 # ClinTrajan Python package
 # 
-# Copyright (C) 2020,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
-# Copyright (C) 2020,  University of Leicester, University Rd, Leicester LE1 7RH, UK
-# Copyright (C) 2020,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
+# Copyright (C) 2024,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
+# Copyright (C) 2024,  University of Leicester, University Rd, Leicester LE1 7RH, UK
+# Copyright (C) 2024,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
 # 
 # ClinTrajan is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -46,13 +46,13 @@ from sklearn.decomposition import PCA
 
 from umap import UMAP
 
-import tensorflow as tf
+#import tensorflow as tf
 
-from tensorflow import keras
+#from tensorflow import keras
 
-from tensorflow.keras.layers import Input, Dense, Lambda
-from tensorflow.keras.models import Model
-from tensorflow.keras import backend as K
+#from tensorflow.keras.layers import Input, Dense, Lambda
+#from tensorflow.keras.models import Model
+#from tensorflow.keras import backend as K
 
 def apply_panel_of_manifold_learning_methods(X,color,
                                 Color_by_branches=[],precomputed_results={},
@@ -63,6 +63,9 @@ def apply_panel_of_manifold_learning_methods(X,color,
                                 methods_to_apply=[],
                                 n_subplots_x = 4, n_subplots_y = 3,
                                 figsizex = 20, figsizey =20):
+    '''
+    
+    '''
     viz_results = precomputed_results
     #Set figure parameters
     n_points = X.shape[0]
@@ -315,112 +318,112 @@ def apply_panel_of_manifold_learning_methods(X,color,
         plt.axis('tight')
                 
 
-    ### Autoencoder ###
-    if applyAllMethods or 'AUTOENCODER' in methods_to_apply:        
-        layer_sizes = [64,32,16,8,4]
-        #encoder
-        inputs = Input(shape=(X.shape[1],), name='encoder_input')
-        x = inputs
-        for size in layer_sizes:
-            x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
-        latent = Dense(n_components,kernel_initializer='he_uniform', name='latent_vector')(x)
-        encoder = Model(inputs, latent, name='encoder')
+    # ### Autoencoder ###
+    # if applyAllMethods or 'AUTOENCODER' in methods_to_apply:        
+    #     layer_sizes = [64,32,16,8,4]
+    #     #encoder
+    #     inputs = Input(shape=(X.shape[1],), name='encoder_input')
+    #     x = inputs
+    #     for size in layer_sizes:
+    #         x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
+    #     latent = Dense(n_components,kernel_initializer='he_uniform', name='latent_vector')(x)
+    #     encoder = Model(inputs, latent, name='encoder')
 
-        #decoder
-        latent_inputs = Input(shape=(n_components,), name='decoder_input')
-        x = latent_inputs
-        for size in layer_sizes[::-1]:
-            x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
-        outputs = Dense(X.shape[1] ,activation='sigmoid',kernel_initializer='he_uniform',name='decoder_output')(x)
-        decoder = Model(latent_inputs, outputs, name='decoder')
+    #     #decoder
+    #     latent_inputs = Input(shape=(n_components,), name='decoder_input')
+    #     x = latent_inputs
+    #     for size in layer_sizes[::-1]:
+    #         x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
+    #     outputs = Dense(X.shape[1] ,activation='sigmoid',kernel_initializer='he_uniform',name='decoder_output')(x)
+    #     decoder = Model(latent_inputs, outputs, name='decoder')
 
-        #autoencoder
-        autoencoder = Model(inputs, decoder(encoder(inputs)), name='autoencoder')
+    #     #autoencoder
+    #     autoencoder = Model(inputs, decoder(encoder(inputs)), name='autoencoder')
 
-        #model summary
-        # encoder.summary()
-        # decoder.summary()
-        # autoencoder.summary()
-        X_01 = (X-X.min())/(X.max()-X.min())
-        autoencoder.compile(loss='mse', optimizer='adam')
-        t0 = time()
-        if  not onlyDraw  or not 'AUTOENCODER' in precomputed_results:
-            autoencoder.fit(x=X_01,y=X_01,epochs=200,verbose=0)
-            Y_AUTOENCODER = encoder.predict(X_01)
-            viz_results['AUTOENCODER'] = Y_AUTOENCODER
-        else:
-            Y_AUTOENCODER = viz_results['AUTOENCODER']
-        t1 = time()
-        print("Autoencoder: %.2g sec" % (t1 - t0))
+    #     #model summary
+    #     # encoder.summary()
+    #     # decoder.summary()
+    #     # autoencoder.summary()
+    #     X_01 = (X-X.min())/(X.max()-X.min())
+    #     autoencoder.compile(loss='mse', optimizer='adam')
+    #     t0 = time()
+    #     if  not onlyDraw  or not 'AUTOENCODER' in precomputed_results:
+    #         autoencoder.fit(x=X_01,y=X_01,epochs=200,verbose=0)
+    #         Y_AUTOENCODER = encoder.predict(X_01)
+    #         viz_results['AUTOENCODER'] = Y_AUTOENCODER
+    #     else:
+    #         Y_AUTOENCODER = viz_results['AUTOENCODER']
+    #     t1 = time()
+    #     print("Autoencoder: %.2g sec" % (t1 - t0))
 
-        i += 1
-        ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
-        plt.scatter(Y_AUTOENCODER[:, 0], Y_AUTOENCODER[:, 1], c=color1, cmap=cmap,s=points_size)
-        plt.title("Autoencoder",fontdict = {'fontsize' : title_fontsize})
-        ax.xaxis.set_major_formatter(NullFormatter())
-        ax.yaxis.set_major_formatter(NullFormatter())
-        plt.axis('tight')        
+    #     i += 1
+    #     ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
+    #     plt.scatter(Y_AUTOENCODER[:, 0], Y_AUTOENCODER[:, 1], c=color1, cmap=cmap,s=points_size)
+    #     plt.title("Autoencoder",fontdict = {'fontsize' : title_fontsize})
+    #     ax.xaxis.set_major_formatter(NullFormatter())
+    #     ax.yaxis.set_major_formatter(NullFormatter())
+    #     plt.axis('tight')        
 
     ### VAE ###
-    if applyAllMethods or 'VAE' in methods_to_apply:        
-        def sampling(args):
-            z_mean, z_log_var = args
-            epsilon = K.random_normal(shape=(n_components,))
-            return z_mean + K.exp(z_log_var) * epsilon
+    # if applyAllMethods or 'VAE' in methods_to_apply:        
+    #     def sampling(args):
+    #         z_mean, z_log_var = args
+    #         epsilon = K.random_normal(shape=(n_components,))
+    #         return z_mean + K.exp(z_log_var) * epsilon
 
-        layer_sizes = [64,32,16,8]
-        #encoder
-        inputs = Input(shape=(X.shape[1],), name='encoder_input')
-        x = inputs
-        for size in layer_sizes:
-            x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
+    #     layer_sizes = [64,32,16,8]
+    #     #encoder
+    #     inputs = Input(shape=(X.shape[1],), name='encoder_input')
+    #     x = inputs
+    #     for size in layer_sizes:
+    #         x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
 
-        z_mean = Dense(n_components,kernel_initializer='he_uniform', name='latent_mean')(x)
-        z_log_var = Dense(n_components,kernel_initializer='he_uniform', name='latent_sigma')(x)
+    #     z_mean = Dense(n_components,kernel_initializer='he_uniform', name='latent_mean')(x)
+    #     z_log_var = Dense(n_components,kernel_initializer='he_uniform', name='latent_sigma')(x)
 
-        z = Lambda(sampling, output_shape=(n_components,))([z_mean, z_log_var])
-        encoder = Model(inputs, [z_mean, z_log_var, z], name='encoder')
+    #     z = Lambda(sampling, output_shape=(n_components,))([z_mean, z_log_var])
+    #     encoder = Model(inputs, [z_mean, z_log_var, z], name='encoder')
 
-        #decoder
-        latent_inputs = Input(shape=(n_components,), name='decoder_input_sampling')
-        x = latent_inputs
-        for size in layer_sizes[::-1]:
-            x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
-        outputs = Dense(X.shape[1] ,activation='sigmoid',kernel_initializer='he_uniform',name='decoder_output')(x)
-        decoder = Model(latent_inputs, outputs, name='decoder')
+    #     #decoder
+    #     latent_inputs = Input(shape=(n_components,), name='decoder_input_sampling')
+    #     x = latent_inputs
+    #     for size in layer_sizes[::-1]:
+    #         x = Dense(size, activation='relu',kernel_initializer='he_uniform')(x)
+    #     outputs = Dense(X.shape[1] ,activation='sigmoid',kernel_initializer='he_uniform',name='decoder_output')(x)
+    #     decoder = Model(latent_inputs, outputs, name='decoder')
 
-        #autoencoder
-        vae = Model(inputs, decoder(encoder(inputs)[2]), name='vae')
+    #     #autoencoder
+    #     vae = Model(inputs, decoder(encoder(inputs)[2]), name='vae')
 
-        def vae_loss(x, x_decoded_mean):
-            xent_loss = K.mean(K.square((x- x_decoded_mean)))
-            kl_loss = - 0.5 * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
-            #print(type(xent_loss))
-            #print(type(kl_loss))
-            #return K.sum(xent_loss,kl_loss)
-            #return tf.convert_to_tensor(kl_loss)
-            return xent_loss+kl_loss
-        vae.compile(optimizer='adam', loss=vae_loss)
+    #     def vae_loss(x, x_decoded_mean):
+    #         xent_loss = K.mean(K.square((x- x_decoded_mean)))
+    #         kl_loss = - 0.5 * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
+    #         #print(type(xent_loss))
+    #         #print(type(kl_loss))
+    #         #return K.sum(xent_loss,kl_loss)
+    #         #return tf.convert_to_tensor(kl_loss)
+    #         return xent_loss+kl_loss
+    #     vae.compile(optimizer='adam', loss=vae_loss)
 
-        X_01 = (X-X.min())/(X.max()-X.min())
-        #print(X_01)
-        #X_01 = X.copy()
-        t0 = time()
-        if  not onlyDraw  or not 'VAE' in precomputed_results:
-            vae.fit(x=X_01,y=X_01,epochs=200,verbose=0)
-            Y_VAE = encoder.predict(X_01)[0]
-            viz_results['VAE'] = Y_VAE
-        else:
-            Y_VAE = viz_results['VAE']
-        t1 = time()
-        print("VAE: %.2g sec" % (t1 - t0))
-        i += 1
-        ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
-        plt.scatter(Y_VAE[:, 0], Y_VAE[:, 1], c=color1, cmap=cmap)
-        plt.title("VAE",fontdict = {'fontsize' : title_fontsize})
-        ax.xaxis.set_major_formatter(NullFormatter())
-        ax.yaxis.set_major_formatter(NullFormatter())
-        plt.axis('tight')
+    #     X_01 = (X-X.min())/(X.max()-X.min())
+    #     #print(X_01)
+    #     #X_01 = X.copy()
+    #     t0 = time()
+    #     if  not onlyDraw  or not 'VAE' in precomputed_results:
+    #         vae.fit(x=X_01,y=X_01,epochs=200,verbose=0)
+    #         Y_VAE = encoder.predict(X_01)[0]
+    #         viz_results['VAE'] = Y_VAE
+    #     else:
+    #         Y_VAE = viz_results['VAE']
+    #     t1 = time()
+    #     print("VAE: %.2g sec" % (t1 - t0))
+    #     i += 1
+    #     ax = fig.add_subplot(n_subplots_x,n_subplots_y,i)
+    #     plt.scatter(Y_VAE[:, 0], Y_VAE[:, 1], c=color1, cmap=cmap)
+    #     plt.title("VAE",fontdict = {'fontsize' : title_fontsize})
+    #     ax.xaxis.set_major_formatter(NullFormatter())
+    #     ax.yaxis.set_major_formatter(NullFormatter())
+    #     plt.axis('tight')
 
     plt.tight_layout()
     

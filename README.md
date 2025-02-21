@@ -24,6 +24,7 @@ We also assume that clinical trajectories can be characterized by branching stru
 some important bifurcations in the development of a disease. 
 
 Extracting cellular trajectories is a widely used methodology of data analysis in genomics, especially in studying certain highly dynamic phenomena such as differentiation or development. 
+
 Quantifying and visualizing clinical trajectories represents a more challenging data mining problem due to the data specificity.
 
 ## Method of elastic principal graphs (ElPiGraph) for extracting and analyzing the clinical trajectories
@@ -99,8 +100,18 @@ In order to use them, download the content of the git and start the notebook fro
 * [PT_Diabetes.ipynb](PT_Diabetes.ipynb) - notebook providing the details of the analysis of clinical trajectories for the diabetes dataset
 
 
+## Use of ClinTrajAn in studying large-scale clinical datasets
+
+ClinTrajAn was used to analyse two large-scale clinical datasets collected on the cohorts of COPD (Chronic Obstructive Pulmonary Disease) patients (3).
+An elastic principal tree was fitted to the reduced space. 4,585 participants from COPDGene Phase 2 were used to test longitudinal trajectories. 2,652 participants from SPIROMICS tested external reproducibility. The study used cross-sectional data to create an elastic principal tree, where the concept of time is represented by distance on the tree. Six clinically distinct tree segments were identified that differed by lung function, symptoms, and CT features: 1) Subclinical (SC); 2) Parenchymal Abnormality (PA); 3) Chronic Bronchitis (CB); 4) Emphysema Male (EM); 5) Emphysema Female (EF); and 6) Severe Airways (SA) disease. Cross-sectional SPIROMICS data confirmed similar groupings. 5-year data from COPDGene mapped longitudinal changes onto the tree. 29% of patients changed segment during follow-up; longitudinal trajectories confirmed a net flow of patients along the tree, from SC towards Emphysema, although alternative trajectories were noted, through airway disease predominant phenotypes, CB and SA.
+
+Another example of ClinTrajAn use is for [analysing multi-omics data for revealing the mechanisms of drug resistance](https://www.nature.com/articles/s41467-025-55914-x).
+
+
 ## References:
 
 (1) [Albergante L, Mirkes E, Bac J, Chen H, Martin A, Faure L, Barillot E, Pinello L, Gorban A, Zinovyev A. Robust and scalable learning of complex intrinsic dataset geometry via ElPiGraph. 2020. Entropy 22(3):296](https://www.mdpi.com/1099-4300/22/3/296)
 
-(2) [Golovenkin SE, Bac J, Chervov A, Mirkes EM, Orlova YV, Barillot E, Gorban AN, Zinovyev A. Trajectories, bifurcations and pseudotime in large clinical datasets: applications to myocardial infarction and diabetes data. 2020. arXiv:2007.03788](https://arxiv.org/abs/2007.03788)
+(2) [Golovenkin SE, Bac J, Chervov A, Mirkes EM, Orlova YV, Barillot E, Gorban AN, Zinovyev A. Trajectories, bifurcations and pseudotime in large clinical datasets: applications to myocardial infarction and diabetes data. GigaScience, Volume 9, Issue 11, November 2020, giaa128](https://doi.org/10.1093/gigascience/giaa128)
+
+(3) [Bell AJ, Ram S, Labaki WW, Murray S, Kazerooni EA, Galban S, Martinez FJ, Hatt CR, Wang JM, Ivanov V, McGettigan P, Khokhlovich E, Maiorino E, Suryadevara R, Boueiz A, Castaldi P, Mirkes EM, Zinovyev A, Gorban AN, Galban CJ, Han MK. Temporal Exploration of COPD Phenotypes: Insights from the COPDGene and SPIROMICS Cohorts. Am J Respir Crit Care Med. 2024 ](https://doi.org/10.1164/rccm.202401-0127oc)

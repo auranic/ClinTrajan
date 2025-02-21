@@ -1,8 +1,8 @@
 # ClinTrajan Python package
 # 
-# Copyright (C) 2020,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
-# Copyright (C) 2020,  University of Leicester, University Rd, Leicester LE1 7RH, UK
-# Copyright (C) 2020,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
+# Copyright (C) 2024,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
+# Copyright (C) 2024,  University of Leicester, University Rd, Leicester LE1 7RH, UK
+# Copyright (C) 2024,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
 # 
 # ClinTrajan is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ def quantify_ordinal_vector(ord_var, center=True):
     replacement_map = {}
     for i,val in enumerate(unv):
         val = int(val)
-        replacement_map[val] = unv_quantified[i]
+        replacement_map[val] = float(unv_quantified[i])
     ord_var_quantified = ord_var
     for i,v in enumerate(unv):
         ord_var_quantified = np.where(ord_var_quantified==v, unv_quantified[i], ord_var_quantified)
@@ -56,7 +56,7 @@ def quantify_ordinal_vector(ord_var, center=True):
         for x in replacement_map:
             val = replacement_map[x]
             val = val-mean_val
-            replacement_map[x] = val
+            replacement_map[x] = float(val)
     return ord_var_quantified, replacement_map
 
 def quantify_dataframe_univariate(df,variable_types):

@@ -1,8 +1,8 @@
 # ClinTrajan Python package
 # 
-# Copyright (C) 2020,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
-# Copyright (C) 2020,  University of Leicester, University Rd, Leicester LE1 7RH, UK
-# Copyright (C) 2020,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
+# Copyright (C) 2024,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
+# Copyright (C) 2024,  University of Leicester, University Rd, Leicester LE1 7RH, UK
+# Copyright (C) 2024,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
 # 
 # ClinTrajan is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public

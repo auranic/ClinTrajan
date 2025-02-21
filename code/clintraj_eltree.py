@@ -1,8 +1,8 @@
 # ClinTrajan Python package
 # 
-# Copyright (C) 2020,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
-# Copyright (C) 2020,  University of Leicester, University Rd, Leicester LE1 7RH, UK
-# Copyright (C) 2020,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
+# Copyright (C) 2024,  Curie Institute, 26 rue d'Ulm, 75005 Paris - FRANCE
+# Copyright (C) 2024,  University of Leicester, University Rd, Leicester LE1 7RH, UK
+# Copyright (C) 2024,  Lobachevsky University, 603000 Nizhny Novgorod, Russia
 # 
 # ClinTrajan is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -751,12 +751,12 @@ def regress_variable_on_pseudotime(pseudotime,vals,TrajName,var_name,var_type,pr
         if len(np.unique(vals))==1:
             regressor = None
         else:
-            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none',solver='lbfgs').fit(pseudotime, vals)
+            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty=None,solver='lbfgs').fit(pseudotime, vals)
     if var_type=='CATEGORICAL':
         if len(np.unique(vals))==1:
             regressor = None
         else:
-            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty='none',solver='lbfgs').fit(pseudotime, vals)
+            regressor = LogisticRegression(random_state=0,max_iter=1000,penalty=None,solver='lbfgs').fit(pseudotime, vals)
     if var_type=='CONTINUOUS' or var_type=='ORDINAL':
         if len(np.unique(vals))==1:
             regressor = None

@@ -326,3 +326,44 @@ df_new.to_csv('results/infarction/all_dummies_treetable_new.txt',sep='\t',index=
 
 Note that we should apply the same preprocessing steps to the data that we plan to project onto the graph as was applied to the initial data.
 
+### Plot a feature as a function of pseudotime along several trajectories
+
+The principal tree extracts several possible trajectories along which a disease progression can take place. Individual features can have different dynamics along distinct trajectories, and in some situations it can be useful to visualize all the dynamics along several trajectories in the same plot. This allows one to better characterize and interpret the meaning of trajectories.
+
+Below we provide a snippet of code producing such visualization. In this case, we show the dependence of AGE (patient age) as a function of pseudotime along all trajectories of the principal tree.
+
+```
+import seaborn as sns
+
+#feature = 'GB'
+feature = 'AGE'
+#feature = 'LET_IS_0'
+#feature = 'K_BLOOD'
+irx = variable_names.index(feature)
+nodes = tree_extended['NodePositions']
+nodes_real = nodes@v.T+mean_val
+#nodes_real = nodes_real*std_original+mean_val_original
+nodes_real = nodes_real*np.std(X_original)+np.mean(X_original,axis=0)
+
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w','tab:pink','tab:green']
+
+plt.figure(figsize=(15,10))
+
+for i,pstt in enumerate(PseudoTimeTraj):
+    pstt = PseudoTimeTraj[i]
+    TrajName = 'Trajectory:'+str(pstt['Trajectory'][0])+'--'+str(pstt['Trajectory'][-1])
+    points = pstt['Points']
+    pseudotime = pstt['Pseudotime']
+    nodes_irx = pstt['Trajectory']
+    plt.plot(np.arange(len(nodes_irx)),nodes_real[nodes_irx,irx],linewidth=10,color=colors[i],label=TrajName)
+    plt.plot(pseudotime,X_original[points,irx],'.',color=colors[i])
+    plt.ylabel(feature)
+    
+plt.legend()
+plt.show()
+```
+
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/variable_dynamics_along_all_trajectories.png)
+
+

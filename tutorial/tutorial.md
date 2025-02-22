@@ -366,4 +366,27 @@ plt.show()
 
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/variable_dynamics_along_all_trajectories.png)
 
+### Exporting the results of data partitioning induced by the principal graph and the pseudotime analysis
 
+In some analyses, it might be necessary to export the results of projecting data points onto the principal graph, and also the partitioning of the data according to the principal graph segments. These results can be exported to a file that can be analysed by an external data analysis procedures.
+
+Here is a code snippet allowing to perform such export.
+
+```
+vec_labels_by_branches = partition_data_by_tree_branches(X,tree_extended).astype(np.int32)
+table2save = save_point_projections_in_table(vec_labels_by_branches,PseudoTimeTraj)
+table2save.to_csv('results/infarction/all_dummies_treetable.txt',sep='\t',index=False)
+```
+![](https://github.com/auranic/ClinTrajan/blob/master/images/exported_table.png)
+
+The meaning of the columns in the exported file are the following:
+
+Point - the number of a data point in the order provided in the X matrix
+
+Segment	- the segment id onto which the data point has been projected
+
+Pseudotime	- the pseudotime of the data point, or the distance along the tree from the root node
+
+Trajectories - all trajectories to which the data point belongs; the trajectories are indicated by the node id of the end node in the trajectory
+
+Trajectory:root--endnode - binary columns indicating all trajectories to which the data point belongs

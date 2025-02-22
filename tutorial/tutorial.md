@@ -266,3 +266,24 @@ for i,pstt in enumerate(PseudoTimeTraj):
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/hazard_pseudotime.png)
 
 We can see that six out of nine trajectories are associated with significantly increasing lethality risk.
+
+### Creating Accuracy/Complexity plot to define the optimal size of the graph
+
+An important hyperparameter of computing the principal graph is the final number of nodes in it.
+To select the most optimal number of nodes, one can use so called accuracy/complexity plot, described in details in [this publication](https://doi.org/10.1016/j.camwa.2012.12.009). The plot shows the growth of geometrical complexity, a quantity denoted as URN2 as a function of the fraction of explained variance. Local minima of the geometrical complexity signifies transitions in the complexity of the graph, and the local slope of the dependence signifies the local cost of increasing one unit of the fraction of explained variance in units of geometrical complexity URN2. Rapid increase of the slope can indicate the unappropriate growth of the graph-based approximation.
+
+The plot can be built using plotAccuracyComplexityPlot function:
+```
+nnodes = 70
+tree_elpi = elpigraph.computeElasticPrincipalTree(X,nnodes,
+                                                  alpha=0.01,Mu=0.1,Lambda=0.05,
+                                                  FinalEnergy='Penalized',Do_PCA=True,verbose=True)
+tree_elpi = tree_elpi[0]
+plotAccuracyComplexityPlot(tree_elpi=tree_elpi)
+```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/accuracy_complexity_plot.png)
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/fvep_plot.png)
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/complexity.png)

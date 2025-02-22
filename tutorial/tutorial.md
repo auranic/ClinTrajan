@@ -270,7 +270,7 @@ We can see that six out of nine trajectories are associated with significantly i
 ### Creating Accuracy/Complexity plot to define the optimal size of the graph
 
 An important hyperparameter of computing the principal graph is the final number of nodes in it.
-To select the most optimal number of nodes, one can use so called accuracy/complexity plot, described in details in [this publication](https://doi.org/10.1016/j.camwa.2012.12.009). The plot shows the growth of geometrical complexity, a quantity denoted as URN2 as a function of the fraction of explained variance. Local minima of the geometrical complexity signifies transitions in the complexity of the graph, and the local slope of the dependence signifies the local cost of increasing one unit of the fraction of explained variance in units of geometrical complexity URN2. Rapid increase of the slope can indicate the unappropriate growth of the graph-based approximation.
+To select the most optimal number of nodes, one can use so called accuracy/complexity plot, described in details in [this publication](https://doi.org/10.1016/j.camwa.2012.12.009). The plot shows the growth of geometrical complexity, a quantity denoted as URN2 as a function of the fraction of explained variance. Local minima of the geometrical complexity signifies transitions in the complexity of the graph, and the local slope of the dependence signifies the local cost of increasing one unit of the fraction of explained variance in units of geometrical complexity URN2. Rapid increase of the slope can indicate the unappropriate growth of the graph-based approximation and "overfitting" the graph to the data.
 
 The plot can be built using plotAccuracyComplexityPlot function:
 ```
@@ -287,3 +287,42 @@ plotAccuracyComplexityPlot(tree_elpi=tree_elpi)
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/fvep_plot.png)
 
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/complexity.png)
+
+As one can see from the plot, from the value of number of nodes hyperparameter around 40, there is a rapid increase in complexity, which can suggest that for the constructed tree it can be meaningfull to decrease the number of nodes from 50 to 40.
+
+### Projecting the data points onto the reference graph
+
+Elastic principal graph builds an explicit representation of the graph in the data space meaning that in case one can obtain additional data points, e.g., from a validation dataset, there is a possibility to project the data onto the constructed graph and verify that the positions of the projected data points appear in the expected positions. Another application of such methodology is in analysing repeatitive measurements separated by a period of time, and quantify the change of the pseudotime induced by progression of a disease. This approach was applied in a [large-scale COPD study](https://www.atsjournals.org/doi/10.1164/rccm.202401-0127OC).
+
+Let us demonstrate this approach by taking a subset of 100 data points from the infarction complication dataset used to build the principal tree, and project them back onto the graph. In this case we can check if the data points have been projected in the same position, thus check the technical validity of the procedure:
+
+```
+new_data = X_original[0:100,:].copy()
+new_data_orig = new_data.copy()
+
+# We first should normalize data and find it in the same space where the tree was constructed
+new_data = quantify_ordinal_variables(new_data,variable_types,cik)
+new_data = (new_data-mean_val_original)/std_original
+new_data = pca.transform(new_data)[:,0:reduced_dimension]
+
+# Then we project the new data onto already constructed tree
+ProjStruct_new = project_on_tree(new_data,tree_extended)
+PseudoTimeTraj_new = quantify_pseudotime(all_trajectories,all_trajectories_edges,ProjStruct_new)
+
+# Show new data
+fig = plt.figure(figsize=(8, 8))
+visualize_eltree_with_data(tree_extended,new_data,new_data_orig,'r',variable_names,
+                          Normal_Point_Size=50,cmap='hot')
+plt.show()
+
+# Now save the projections of the new data into a file
+vec_labels_by_branches_new = partition_data_by_tree_branches(new_data,tree_extended).astype(np.int32)
+df_new = save_point_projections_in_table(vec_labels_by_branches_new,PseudoTimeTraj_new)
+df_new.to_csv('results/infarction/all_dummies_treetable_new.txt',sep='\t',index=False)
+
+```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/reprojected_data.png)
+
+Note that we should apply the same preprocessing steps to the data that we plan to project onto the graph as was applied to the initial data.
+

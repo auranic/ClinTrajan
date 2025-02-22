@@ -34,6 +34,7 @@ from statsmodels.formula.api import ols
 from numpy.lib.stride_tricks import as_strided
 import math
 import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
 
 def associate_with_categorical_var(categorical_var,variable_name,variable,var_type,score_threshold=0.7,pvalue_threshold_parameter=1e-10,verbose=True,Negative_Enrichment=False,Minimal_number_of_points=5,produce_plot=False):
     # compute an association of a categorical variable categorical_var with another variableof type var_type
@@ -239,5 +240,39 @@ def brokenstick_distribution(dim):
             distr[i]=distr[i]+1/(j+1)
         distr[i]=distr[i]/dim
     return distr
+
+def plotAccuracyComplexityPlot(tree_elpi):
+    '''
+    Function plotting Accuracy/Complexity plot as documented in https://doi.org/10.1016/j.camwa.2012.12.009
+    The only argument is the dictionary output from computeElasticPrincipalTree function of ElPiGraph
+    '''
+    report = pd.DataFrame(data=tree_elpi['ReportTable'])
+    report = pd.DataFrame(data={'CODE':report[report.columns[0]].astype(str),
+                        'FVEP':report['FVEP'].astype(np.float32),
+                        'URN2':report['URN2'].astype(np.float32),
+                        'NNODES':report['NNODES'].astype(np.float32)})
+    x = report[['FVEP','URN2','NNODES']].to_numpy()
+    codes = report['CODE']
+    plt.figure(figsize=(15,6))
+    plt.plot(x[:,0],x[:,1],'ko-')
+    plt.xlabel('FVEP')
+    plt.ylabel('URN2')
+    peaks = find_peaks(-x[:,1])
+    for p in peaks[0]:
+        plt.plot([x[p,0],x[p,0]],[0,np.max(x[:,1])])
+        plt.text(x[p,0]-np.max(x[:,0]/100),x[p,1]+np.max(x[:,1])/5,codes[p])
+    plt.text(x[len(x)-1,0],x[len(x)-1,1]+np.max(x[:,1])/20,codes[len(x)-1])
+    plt.show()
+    plt.figure(figsize=(15,3))
+    plt.plot(x[:,2],x[:,0],'ko-')
+    plt.xlabel('Node number')
+    plt.ylabel('FVEP')
+    plt.show()
+    plt.figure(figsize=(15,3))
+    plt.plot(x[:,2],x[:,1],'ro-')
+    plt.xlabel('Node number')
+    plt.ylabel('URN2')
+    plt.show()
+
 
 

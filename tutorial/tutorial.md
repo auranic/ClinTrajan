@@ -7,7 +7,7 @@ Application of ClinTrajan to a clinical dataset consists in two parts:
 1. [Quantification of the data](##quantification-of-the-data)
 2. [Application of ElPiGraph](##application-of-elpigraph-to-quantify-branching-pseudotime) and  [downstream analyses](###downstream-analyses-using-elpigraph)
 
-Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications](https://leicester.figshare.com/articles/dataset/Myocardial_infarction_complications_Database/12045261/3).  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutorial.ipynb). Alternatively, one can copy-paste and run the commands in any convenient Python environment. 
+Here we illustrate only the most basic analysis steps using the [dataset of myocardial infarction complications](https://leicester.figshare.com/articles/dataset/Myocardial_infarction_complications_Database/12045261/3).  In order to follow the tutorial, one has to download the [ClinTrajan git](https://github.com/auranic/ClinTrajan) and unpack locally. The easiest way to run the tutorial is to run the code through [this ClinTrajan tutorial Jupyter notebook](../ClinTrajan_tutoriall_with_newfunctions.ipynb). Alternatively, one can copy-paste and run the commands in any convenient Python environment. 
 
 There exist also [complete Jupyter notebooks](https://github.com/auranic/ClinTrajan/), allowing one to reproduce all the analysis steps reported in the [ClinTrajan manuscript](https://arxiv.org/abs/2007.03788).
 
@@ -270,7 +270,7 @@ We can see that six out of nine trajectories are associated with significantly i
 ### Creating Accuracy/Complexity plot to define the optimal size of the graph
 
 An important hyperparameter of computing the principal graph is the final number of nodes in it.
-To select the most optimal number of nodes, one can use so called accuracy/complexity plot, described in details in [this publication](https://doi.org/10.1016/j.camwa.2012.12.009). The plot shows the growth of geometrical complexity, a quantity denoted as URN2 as a function of the fraction of explained variance. Local minima of the geometrical complexity signifies transitions in the complexity of the graph, and the local slope of the dependence signifies the local cost of increasing one unit of the fraction of explained variance in units of geometrical complexity URN2. Rapid increase of the slope can indicate the unappropriate growth of the graph-based approximation.
+To select the most optimal number of nodes, one can use so called accuracy/complexity plot, described in details in [this publication](https://doi.org/10.1016/j.camwa.2012.12.009). The plot shows the growth of geometrical complexity, a quantity denoted as URN2 as a function of the fraction of explained variance. Local minima of the geometrical complexity signifies transitions in the complexity of the graph, and the local slope of the dependence signifies the local cost of increasing one unit of the fraction of explained variance in units of geometrical complexity URN2. Rapid increase of the slope can indicate the unappropriate growth of the graph-based approximation and "overfitting" the graph to the data.
 
 The plot can be built using plotAccuracyComplexityPlot function:
 ```
@@ -287,3 +287,106 @@ plotAccuracyComplexityPlot(tree_elpi=tree_elpi)
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/fvep_plot.png)
 
 ![](https://github.com/auranic/ClinTrajan/blob/master/images/complexity.png)
+
+As one can see from the plot, from the value of number of nodes hyperparameter around 40, there is a rapid increase in complexity, which can suggest that for the constructed tree it can be meaningfull to decrease the number of nodes from 50 to 40.
+
+### Projecting the data points onto the reference graph
+
+Elastic principal graph builds an explicit representation of the graph in the data space meaning that in case one can obtain additional data points, e.g., from a validation dataset, there is a possibility to project the data onto the constructed graph and verify that the positions of the projected data points appear in the expected positions. Another application of such methodology is in analysing repeatitive measurements separated by a period of time, and quantify the change of the pseudotime induced by progression of a disease. This approach was applied in a [large-scale COPD study](https://www.atsjournals.org/doi/10.1164/rccm.202401-0127OC).
+
+Let us demonstrate this approach by taking a subset of 100 data points from the infarction complication dataset used to build the principal tree, and project them back onto the graph. In this case we can check if the data points have been projected in the same position, thus check the technical validity of the procedure:
+
+```
+new_data = X_original[0:100,:].copy()
+new_data_orig = new_data.copy()
+
+# We first should normalize data and find it in the same space where the tree was constructed
+new_data = quantify_ordinal_variables(new_data,variable_types,cik)
+new_data = (new_data-mean_val_original)/std_original
+new_data = pca.transform(new_data)[:,0:reduced_dimension]
+
+# Then we project the new data onto already constructed tree
+ProjStruct_new = project_on_tree(new_data,tree_extended)
+PseudoTimeTraj_new = quantify_pseudotime(all_trajectories,all_trajectories_edges,ProjStruct_new)
+
+# Show new data
+fig = plt.figure(figsize=(8, 8))
+visualize_eltree_with_data(tree_extended,new_data,new_data_orig,'r',variable_names,
+                          Normal_Point_Size=50,cmap='hot')
+plt.show()
+
+# Now save the projections of the new data into a file
+vec_labels_by_branches_new = partition_data_by_tree_branches(new_data,tree_extended).astype(np.int32)
+df_new = save_point_projections_in_table(vec_labels_by_branches_new,PseudoTimeTraj_new)
+df_new.to_csv('results/infarction/all_dummies_treetable_new.txt',sep='\t',index=False)
+
+```
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/reprojected_data.png)
+
+Note that we should apply the same preprocessing steps to the data that we plan to project onto the graph as was applied to the initial data.
+
+### Plot a feature as a function of pseudotime along several trajectories
+
+The principal tree extracts several possible trajectories along which a disease progression can take place. Individual features can have different dynamics along distinct trajectories, and in some situations it can be useful to visualize all the dynamics along several trajectories in the same plot. This allows one to better characterize and interpret the meaning of trajectories.
+
+Below we provide a snippet of code producing such visualization. In this case, we show the dependence of AGE (patient age) as a function of pseudotime along all trajectories of the principal tree.
+
+```
+import seaborn as sns
+
+#feature = 'GB'
+feature = 'AGE'
+#feature = 'LET_IS_0'
+#feature = 'K_BLOOD'
+irx = variable_names.index(feature)
+nodes = tree_extended['NodePositions']
+nodes_real = nodes@v.T+mean_val
+#nodes_real = nodes_real*std_original+mean_val_original
+nodes_real = nodes_real*np.std(X_original)+np.mean(X_original,axis=0)
+
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w','tab:pink','tab:green']
+
+plt.figure(figsize=(15,10))
+
+for i,pstt in enumerate(PseudoTimeTraj):
+    pstt = PseudoTimeTraj[i]
+    TrajName = 'Trajectory:'+str(pstt['Trajectory'][0])+'--'+str(pstt['Trajectory'][-1])
+    points = pstt['Points']
+    pseudotime = pstt['Pseudotime']
+    nodes_irx = pstt['Trajectory']
+    plt.plot(np.arange(len(nodes_irx)),nodes_real[nodes_irx,irx],linewidth=10,color=colors[i],label=TrajName)
+    plt.plot(pseudotime,X_original[points,irx],'.',color=colors[i])
+    plt.ylabel(feature)
+    
+plt.legend()
+plt.show()
+```
+
+
+![](https://github.com/auranic/ClinTrajan/blob/master/images/variable_dynamics_along_all_trajectories.png)
+
+### Exporting the results of data partitioning induced by the principal graph and the pseudotime analysis
+
+In some analyses, it might be necessary to export the results of projecting data points onto the principal graph, and also the partitioning of the data according to the principal graph segments. These results can be exported to a file that can be analysed by an external data analysis procedures.
+
+Here is a code snippet allowing to perform such export.
+
+```
+vec_labels_by_branches = partition_data_by_tree_branches(X,tree_extended).astype(np.int32)
+table2save = save_point_projections_in_table(vec_labels_by_branches,PseudoTimeTraj)
+table2save.to_csv('results/infarction/all_dummies_treetable.txt',sep='\t',index=False)
+```
+![](https://github.com/auranic/ClinTrajan/blob/master/images/exported_table.png)
+
+The meaning of the columns in the exported file are the following:
+
+Point - the number of a data point in the order provided in the X matrix
+
+Segment	- the segment id onto which the data point has been projected
+
+Pseudotime	- the pseudotime of the data point, or the distance along the tree from the root node
+
+Trajectories - all trajectories to which the data point belongs; the trajectories are indicated by the node id of the end node in the trajectory
+
+Trajectory:root--endnode - binary columns indicating all trajectories to which the data point belongs
